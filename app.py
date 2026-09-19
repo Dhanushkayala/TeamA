@@ -45,7 +45,6 @@ from quant_platform.backtest.engine import BacktestEngine
 from quant_platform.dashboard.styles import apply_custom_css
 from quant_platform.dashboard.components import (
     render_disclaimer_footer,
-    render_section_header,
     render_navbar,
     get_active_page,
 )

@@ -9,21 +9,21 @@ from typing import Dict, Any, List, Optional
 
 from quant_platform.config import DEFAULT_ASSETS, UI_THEME
 
-# Consistent Asset Colors — refined, no neons
+# Consistent Asset Colors — modern, institutional
 ASSET_COLORS = {
     "Gold":    "#f59e0b",   # Warm amber
-    "Bitcoin": "#f97316",   # Soft orange
-    "NVIDIA":  "#3b82f6",   # Clear blue
+    "Bitcoin": "#f97316",   # Vibrant orange
+    "NVIDIA":  "#3b82f6",   # Deep blue
 }
 
 # Fallback palette for custom tickers
 _FALLBACK_PALETTE = [
-    "#22c55e",  # green
-    "#8b5cf6",  # purple
+    "#10b981",  # emerald
     "#06b6d4",  # cyan
-    "#ec4899",  # rose
-    "#a3e635",  # lime
-    "#fb923c",  # orange-light
+    "#8b5cf6",  # purple
+    "#f43f5e",  # rose
+    "#eab308",  # yellow
+    "#38bdf8",  # sky blue
 ]
 
 
@@ -34,21 +34,21 @@ def get_asset_color(asset_name: str, fallback_idx: int = 0) -> str:
     return _FALLBACK_PALETTE[fallback_idx % len(_FALLBACK_PALETTE)]
 
 
-def apply_plotly_theme(fig: go.Figure, title: Optional[str] = None, height: int = 420) -> go.Figure:
-    """Apply the QuantLab dark theme to any Plotly figure."""
+def apply_plotly_theme(fig: go.Figure, title: Optional[str] = None, height: int = 400) -> go.Figure:
+    """Apply high-end institutional dark theme to any Plotly figure."""
     fig.update_layout(
         template="plotly_dark",
         title=dict(
             text=title or "",
-            font=dict(size=14, color="#e6edf3", family="Plus Jakarta Sans, Inter"),
+            font=dict(size=13, color="#f1f5f9", family="Plus Jakarta Sans, sans-serif"),
             x=0.01,
             y=0.97,
         ),
-        paper_bgcolor="#161b22",
-        plot_bgcolor="#161b22",
+        paper_bgcolor="rgba(18, 23, 32, 0.65)",
+        plot_bgcolor="rgba(14, 18, 26, 0.95)",
         height=height,
-        margin=dict(l=44, r=24, t=52, b=36),
-        font=dict(family="Inter", color="#7d8590", size=11),
+        margin=dict(l=46, r=26, t=48, b=36),
+        font=dict(family="Inter, sans-serif", color="#94a3b8", size=11),
         legend=dict(
             orientation="h",
             yanchor="bottom",
@@ -56,25 +56,25 @@ def apply_plotly_theme(fig: go.Figure, title: Optional[str] = None, height: int 
             xanchor="right",
             x=1.0,
             bgcolor="rgba(0,0,0,0)",
-            font=dict(size=11, color="#adbac7"),
+            font=dict(size=11, color="#cbd5e1"),
         ),
         xaxis=dict(
-            gridcolor="#21262d",
-            zerolinecolor="#30363d",
+            gridcolor="rgba(255, 255, 255, 0.04)",
+            zerolinecolor="rgba(255, 255, 255, 0.08)",
             showgrid=True,
-            linecolor="#30363d",
+            linecolor="rgba(255, 255, 255, 0.08)",
         ),
         yaxis=dict(
-            gridcolor="#21262d",
-            zerolinecolor="#30363d",
+            gridcolor="rgba(255, 255, 255, 0.04)",
+            zerolinecolor="rgba(255, 255, 255, 0.08)",
             showgrid=True,
-            linecolor="#30363d",
+            linecolor="rgba(255, 255, 255, 0.08)",
         ),
         hovermode="x unified",
         hoverlabel=dict(
-            bgcolor="#1c2333",
-            bordercolor="#30363d",
-            font=dict(family="JetBrains Mono, monospace", size=11, color="#e6edf3"),
+            bgcolor="#18202c",
+            bordercolor="#3b82f6",
+            font=dict(family="JetBrains Mono, monospace", size=11, color="#ffffff"),
         ),
     )
     return fig
@@ -87,57 +87,83 @@ def render_metric_card(
     delta: Optional[str] = None,
     delta_color: str = "normal",
     accent_color: Optional[str] = None,
+    sub_text: Optional[str] = None,
+    color: Optional[str] = None,
 ) -> None:
-    """Render a sleek metric card. Optionally provide accent_color for the top border."""
+    """Render a sleek metric card with subtle glassmorphic styling."""
+    display_sub = sub_text if sub_text is not None else subtitle
+    
+    # Resolve accent color from semantic names or direct hex
+    raw_color = color or accent_color
+    color_map = {
+        "accent": "#3b82f6",
+        "positive": "#10b981",
+        "negative": "#f43f5e",
+        "warning": "#f59e0b",
+        "default": "rgba(255, 255, 255, 0.1)",
+    }
+    resolved_accent = color_map.get(raw_color, raw_color)
+
     delta_html = ""
     if delta:
-        cls = {
-            "positive": "delta-positive",
-            "negative": "delta-negative",
-        }.get(delta_color, "")
+        d_color = "#10b981" if delta_color == "positive" else ("#f43f5e" if delta_color == "negative" else "#94a3b8")
         arrow = "▲" if delta_color == "positive" else ("▼" if delta_color == "negative" else "")
-        delta_html = f"<span class='{cls}'>{arrow} {delta}</span>"
+        delta_html = f"<span style='font-size:0.75rem; color:{d_color}; font-weight:700; margin-left:6px; background:rgba(255,255,255,0.04); padding:2px 6px; border-radius:4px;'>{arrow} {delta}</span>"
 
-    style_extra = f"--card-accent:{accent_color};" if accent_color else ""
+    border_style = f"border-top: 3px solid {resolved_accent};" if resolved_accent else ""
 
     card_html = f"""
-    <div class="quant-card" style="{style_extra}">
+    <div class="quant-card" style="{border_style}">
         <div class="quant-card-title">{title}</div>
         <div class="quant-card-value">{value} {delta_html}</div>
-        <div class="quant-card-sub">{subtitle}</div>
+        <div class="quant-card-sub">{display_sub}</div>
     </div>
     """
     st.markdown(card_html, unsafe_allow_html=True)
 
 
-def render_section_header(icon: str, title: str, subtitle: str = "") -> None:
-    """Render a consistent section header with icon box."""
+def render_section_banner(
+    title: str,
+    subtitle: str = "",
+    badge_text: str = "",
+    badge_color: str = "#3b82f6",
+    icon: str = "⚡",
+) -> None:
+    """Render an impressive section hero banner."""
+    badge_html = f"<span style='font-size:0.75rem; font-weight:600; color:{badge_color}; background:rgba(255,255,255,0.06); padding:4px 10px; border-radius:12px; border:1px solid rgba(255,255,255,0.1);'>{badge_text}</span>" if badge_text else ""
+
     st.markdown(f"""
-    <div class="section-header">
-        <div class="section-header-icon">{icon}</div>
-        <div class="section-header-text">
-            <h4>{title}</h4>
-            {"<p>" + subtitle + "</p>" if subtitle else ""}
+    <div class="section-banner">
+        <div class="section-banner-left">
+            <div class="section-banner-icon">{icon}</div>
+            <div>
+                <h3 class="section-banner-title">{title}</h3>
+                <p class="section-banner-sub">{subtitle}</p>
+            </div>
+        </div>
+        <div>
+            {badge_html}
         </div>
     </div>
     """, unsafe_allow_html=True)
+
+
+def render_section_header(title: str, subtitle: str = "", icon: str = "📊") -> None:
+    """Backward-compatible section header wrapper."""
+    render_section_banner(title=title, subtitle=subtitle, icon=icon)
 
 
 def render_disclaimer_footer() -> None:
     """Persistent disclaimer footer across all dashboard views."""
     st.markdown("""
     <div class="quant-disclaimer">
-        ⚠️ <strong>Research &amp; Educational Use Only</strong> — QuantLab is for quantitative
-        research, risk modeling, and historical backtesting analysis. Past performance
-        does not guarantee future results. Simulated execution assumes zero liquidity
-        constraints beyond modeled slippage. Not financial advice.
+        ⚠️ <strong>Research &amp; Educational System</strong> — QuantLab provides historical simulation, risk modeling, and algorithmic intelligence. Simulated execution assumes zero liquidity constraints beyond modeled slippage. Past results do not guarantee future performance.
     </div>
     """, unsafe_allow_html=True)
 
 
 # ─── Navigation Bar ──────────────────────────────────────────────────────────
 
-# Ordered list of (key, label) for the nav
 NAV_PAGES: list[tuple[str, str]] = [
     ("overview",  "🏠 Overview"),
     ("risk",      "⚡ Risk"),
@@ -159,31 +185,32 @@ def get_active_page() -> str:
 def render_navbar(username: str, display_name: str) -> None:
     """
     Render the sticky top navigation bar.
-
-    Injects the logo, all nav page buttons, and a user pill on the right.
-    Clicking a nav button updates session_state[_NAV_STATE_KEY] and triggers a rerun.
+    Injects brand, live sync tag, nav page buttons, and a user pill on the right.
     """
     active = get_active_page()
     initials = "".join(w[0].upper() for w in (display_name or username).split()[:2])
 
-    # ── HTML chrome: logo + user info (pure HTML, no interactivity) ──────────
     st.markdown(f"""
     <div class="ql-navbar">
         <div class="ql-navbar-brand">
             <div class="ql-navbar-logo">Q</div>
-            <span class="ql-navbar-name">QuantLab</span>
+            <div>
+                <span class="ql-navbar-name">QuantLab</span>
+            </div>
+            <div class="ql-live-tag">
+                <span class="ql-live-dot"></span> Sync Active
+            </div>
         </div>
-        <!-- nav items inserted by Streamlit columns below via CSS overlap -->
         <div style="display:flex; align-items:center; gap:10px; margin-left:auto;">
             <div style="display:flex; align-items:center; gap:8px;
-                        padding:5px 12px; background:var(--bg-elevated);
+                        padding:4px 12px; background:var(--bg-elevated);
                         border:1px solid var(--border); border-radius:20px;">
-                <div style="width:26px; height:26px; border-radius:50%;
-                            background:linear-gradient(135deg,#1d4ed8,#6366f1);
+                <div style="width:24px; height:24px; border-radius:50%;
+                            background:linear-gradient(135deg,#2563eb,#7c3aed);
                             display:flex; align-items:center; justify-content:center;
-                            font-size:0.75rem; font-weight:700; color:#fff;
+                            font-size:0.72rem; font-weight:700; color:#fff;
                             font-family:'Plus Jakarta Sans',sans-serif;">{initials}</div>
-                <span style="font-size:0.82rem; font-weight:600;
+                <span style="font-size:0.80rem; font-weight:600;
                              color:var(--text-secondary);
                              font-family:'Inter',sans-serif;">@{username}</span>
             </div>
@@ -191,17 +218,12 @@ def render_navbar(username: str, display_name: str) -> None:
     </div>
     """, unsafe_allow_html=True)
 
-    # ── Nav buttons rendered in a tight horizontal row ────────────────────────
-    # We use columns with equal width — each column holds one button
     cols = st.columns(len(NAV_PAGES), gap="small")
-
     for col, (page_key, label) in zip(cols, NAV_PAGES):
         with col:
             btn_class = "ql-nav-btn-active" if active == page_key else "ql-nav-btn"
-            # Wrap in a container that carries the CSS class
             st.markdown(f'<div class="{btn_class}">', unsafe_allow_html=True)
             if st.button(label, key=f"nav_{page_key}", use_container_width=True):
                 st.session_state[_NAV_STATE_KEY] = page_key
                 st.rerun()
             st.markdown("</div>", unsafe_allow_html=True)
-
