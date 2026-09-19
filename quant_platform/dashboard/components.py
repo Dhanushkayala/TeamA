@@ -221,14 +221,10 @@ NAV_PAGES: list[tuple[str, str]] = [
     ("backtest",  "Backtest"),
     ("robust",    "Robustness"),
     ("regimes",   "Regimes"),
-    ("profile",   "Profile"),
 ]
 
-def get_nav_pages(role: str = "user") -> list[tuple[str, str]]:
-    pages = NAV_PAGES.copy()
-    if role == "admin":
-        pages.append(("admin", "Admin"))
-    return pages
+def get_nav_pages() -> list[tuple[str, str]]:
+    return NAV_PAGES.copy()
 
 _NAV_STATE_KEY = "ql_active_page"
 
@@ -238,15 +234,14 @@ def get_active_page() -> str:
     return st.session_state.get(_NAV_STATE_KEY, "overview")
 
 
-def render_navbar(username: str, display_name: str, role: str = "user") -> None:
+def render_navbar() -> None:
     """
     Render the unified sticky top navigation bar.
     Integrates Brand/Logo, Live sync badge, segmented page navigation,
-    Light/Dark Mode toggle switch, and user profile pill in a single horizontal layout.
+    and Light/Dark Mode toggle switch.
     """
     active = get_active_page()
     theme = get_current_theme()
-    initials = "".join(w[0].upper() for w in (display_name or username).split()[:2])
 
     def on_nav_theme_toggle_change():
         is_light = st.session_state.get("nav_theme_toggle_switch", False)
@@ -261,8 +256,8 @@ def render_navbar(username: str, display_name: str, role: str = "user") -> None:
                 box-shadow:var(--shadow-card);">
     """, unsafe_allow_html=True)
 
-    col_brand, col_nav, col_toggle, col_user = st.columns(
-        [2.2, 5.0, 1.4, 1.4],
+    col_brand, col_nav, col_toggle = st.columns(
+        [2.5, 6.0, 1.5],
         vertical_alignment="center",
         gap="small"
     )
@@ -286,7 +281,7 @@ def render_navbar(username: str, display_name: str, role: str = "user") -> None:
         """, unsafe_allow_html=True)
 
     with col_nav:
-        nav_pages_list = get_nav_pages(role)
+        nav_pages_list = get_nav_pages()
         page_labels = [label for key, label in nav_pages_list]
         default_label = next((label for key, label in nav_pages_list if key == active), page_labels[0])
         selected_label = st.segmented_control(
@@ -308,21 +303,6 @@ def render_navbar(username: str, display_name: str, role: str = "user") -> None:
             on_change=on_nav_theme_toggle_change,
         )
 
-    with col_user:
-        st.markdown(f"""
-        <div style="display:flex; align-items:center; justify-content:flex-end; gap:8px;">
-            <div style="width:28px; height:28px; border-radius:50%;
-                        background:linear-gradient(135deg,#2563eb,#7c3aed);
-                        display:flex; align-items:center; justify-content:center;
-                        font-size:0.75rem; font-weight:700; color:#fff;
-                        font-family:'Plus Jakarta Sans',sans-serif;
-                        box-shadow:0 2px 6px rgba(37,99,235,0.3);">{initials}</div>
-            <span style="font-size:0.80rem; font-weight:600;
-                         color:var(--text-secondary);
-                         font-family:'Inter',sans-serif;
-                         max-width:90px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">@{username}</span>
-        </div>
-        """, unsafe_allow_html=True)
-
     st.markdown("</div>", unsafe_allow_html=True)
+
 

@@ -56,11 +56,7 @@ from quant_platform.dashboard.views import (
     render_robustness_view,
     render_regime_view,
     render_ai_view,
-    render_profile_view,
-    render_admin_view,
 )
-from quant_platform.auth.authenticator import render_auth_page, render_logout_button, get_auth_state, get_user_role
-from quant_platform.auth.user_store import save_session
 
 
 # 1. Theme State & Design System CSS
@@ -68,18 +64,6 @@ if "ql_theme" not in st.session_state:
     st.session_state["ql_theme"] = "dark"
 
 apply_custom_css(theme=st.session_state["ql_theme"])
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 2. AUTHENTICATION GATE
-# ─────────────────────────────────────────────────────────────────────────────
-is_authenticated, current_name, current_username = get_auth_state()
-current_role = get_user_role()
-
-if not is_authenticated:
-    is_authenticated, current_name, current_username = render_auth_page()
-    if not is_authenticated:
-        st.stop()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -108,24 +92,12 @@ def load_multi_asset_data(assets_list: tuple, start_date: str, end_date: str, cu
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 4. SIDEBAR
+# 3. SIDEBAR
 # ─────────────────────────────────────────────────────────────────────────────
 with st.sidebar:
-    # User pill at top
-    initials = "".join(w[0].upper() for w in (current_name or current_username).split()[:2])
-    st.markdown(f"""
-    <div class="sidebar-user-pill">
-        <div class="sidebar-avatar-sm">{initials}</div>
-        <div>
-            <p class="sidebar-user-name">{current_name or current_username}</p>
-            <p class="sidebar-user-role">@{current_username}</p>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
     st.markdown("""
-    <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
-        <div style="width:28px; height:28px; border-radius:7px; background:linear-gradient(135deg,#1d4ed8,#6366f1); display:flex; align-items:center; justify-content:center; font-weight:800; color:#fff; font-size:1.0rem;">&beta;</div>
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px; margin-top:4px;">
+        <div style="width:30px; height:30px; border-radius:8px; background:linear-gradient(135deg,#1d4ed8,#6366f1); display:flex; align-items:center; justify-content:center; font-weight:800; color:#fff; font-size:1.05rem; box-shadow:0 2px 8px rgba(37,99,235,0.4);">&beta;</div>
         <div>
             <span style="font-size:1.05rem; font-weight:700; color:var(--text-primary); font-family:'Plus Jakarta Sans',sans-serif; letter-spacing:-0.02em;">BetaScope</span>
             <span style="font-size:0.70rem; color:var(--text-muted); display:block;">Multi-Asset Intelligence</span>
@@ -255,10 +227,6 @@ with st.sidebar:
     risk_free_pct = st.number_input("Risk-Free Rate (%)", min_value=0.0, max_value=20.0, value=DEFAULT_RISK_FREE_RATE * 100.0, step=0.25)
     risk_free_rate = risk_free_pct / 100.0
 
-    # Sign out at the very bottom
-    st.markdown("---")
-    render_logout_button("sidebar_logout_btn")
-
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 5. FETCH AND ALIGN DATA WITH GRAPHICAL LOADER
@@ -329,57 +297,9 @@ for a_name in aligned_close.columns:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 7. AUTO-SAVE SESSION TO USER PROFILE
+# 7. TOP NAVIGATION BAR + PAGE ROUTING
 # ─────────────────────────────────────────────────────────────────────────────
-# Save once per unique (username + asset + strategy) combo per page load
-_session_key = f"saved_{current_username}_{target_asset}_{strategy_choice}"
-if not st.session_state.get(_session_key, False):
-    metrics = backtest_result.metrics
-    try:
-        save_session(
-            username=current_username,
-            display_name=current_name,
-            asset=target_asset,
-            strategy=strategy_choice,
-            sharpe=float(metrics.get("Sharpe Ratio", 0.0)),
-            total_return_pct=float(metrics.get("Total Return (%)", 0.0)),
-            max_drawdown_pct=float(metrics.get("Max Drawdown (%)", 0.0)),
-            assets_in_universe=list(aligned_close.columns),
-        )
-        st.session_state[_session_key] = True
-    except Exception:
-        pass  # Non-critical — don't break the app
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 8. AI ASSISTANT DIALOG
-# ─────────────────────────────────────────────────────────────────────────────
-@st.dialog("🤖 BetaScope AI — Quantitative Analyst", width="large")
-def show_ai_dialog(
-    asset_name: str,
-    strategy_name: str,
-    strategy_params: dict,
-    backtest_metrics: dict,
-    regime_metrics_df: pd.DataFrame,
-    correlation_matrix: pd.DataFrame,
-    asset_summary_metrics: dict,
-    user_name: str = "",
-):
-    render_ai_view(
-        asset_name=asset_name,
-        strategy_name=strategy_name,
-        strategy_params=strategy_params,
-        backtest_metrics=backtest_metrics,
-        regime_metrics_df=regime_metrics_df,
-        correlation_matrix=correlation_matrix,
-        asset_summary_metrics=asset_summary_metrics,
-    )
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 9. TOP NAVIGATION BAR + PAGE ROUTING
-# ─────────────────────────────────────────────────────────────────────────────
-render_navbar(username=current_username, display_name=current_name, role=current_role)
+render_navbar()
 
 active_page = get_active_page()
 
@@ -427,20 +347,36 @@ elif active_page == "regimes":
         risk_free_rate=risk_free_rate,
     )
 
-elif active_page == "profile":
-    render_profile_view(
-        username=current_username,
-        display_name=current_name,
-    )
-
-elif active_page == "admin":
-    render_admin_view()
-
 st.markdown('</div>', unsafe_allow_html=True)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 10. FLOATING AI CHATBOT FAB (Bottom-Right Corner)
+# 8. AI ASSISTANT DIALOG
+# ─────────────────────────────────────────────────────────────────────────────
+@st.dialog("🤖 BetaScope AI — Quantitative Analyst", width="large")
+def show_ai_dialog(
+    asset_name: str,
+    strategy_name: str,
+    strategy_params: dict,
+    backtest_metrics: dict,
+    regime_metrics_df: pd.DataFrame,
+    correlation_matrix: pd.DataFrame,
+    asset_summary_metrics: dict,
+    user_name: str = "Analyst",
+):
+    render_ai_view(
+        asset_name=asset_name,
+        strategy_name=strategy_name,
+        strategy_params=strategy_params,
+        backtest_metrics=backtest_metrics,
+        regime_metrics_df=regime_metrics_df,
+        correlation_matrix=correlation_matrix,
+        asset_summary_metrics=asset_summary_metrics,
+    )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 9. FLOATING AI CHATBOT FAB (Bottom-Right Corner)
 # ─────────────────────────────────────────────────────────────────────────────
 st.markdown(f"""
 <div class="floating-ai-badge">
@@ -463,7 +399,7 @@ if floating_clicked:
         regime_metrics_df=regime_perf_df,
         correlation_matrix=corr_matrix,
         asset_summary_metrics=macro_summaries,
-        user_name=current_name,
+        user_name="Analyst",
     )
 
 
