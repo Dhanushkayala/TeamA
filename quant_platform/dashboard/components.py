@@ -282,5 +282,6 @@ def render_navbar(username: str, display_name: str) -> None:
         if st.button(theme_toggle_label, key="nav_theme_toggle_btn", use_container_width=True, help="Toggle Light / Dark Mode"):
             new_theme = "light" if theme == "dark" else "dark"
             st.session_state["ql_theme"] = new_theme
-            st.session_state["sidebar_theme_radio"] = "☀️ Light Mode" if new_theme == "light" else "🌙 Dark Mode"
+            # Sync the sidebar radio BEFORE it's instantiated (pre-init guard in app.py handles this on rerun)
+            # Do NOT write to sidebar_theme_radio here — Streamlit owns that key once the widget is rendered
             st.rerun()

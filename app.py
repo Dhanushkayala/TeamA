@@ -136,8 +136,11 @@ with st.sidebar:
         chosen = st.session_state.get("sidebar_theme_radio", "🌙 Dark Mode")
         st.session_state["ql_theme"] = "light" if "Light" in chosen else "dark"
 
-    if "sidebar_theme_radio" not in st.session_state:
-        st.session_state["sidebar_theme_radio"] = "☀️ Light Mode" if st.session_state.get("ql_theme", "dark") == "light" else "🌙 Dark Mode"
+    # Always mirror ql_theme into the radio key BEFORE the widget is created.
+    # This is the only safe place to write to a widget's session-state key.
+    st.session_state["sidebar_theme_radio"] = (
+        "☀️ Light Mode" if st.session_state.get("ql_theme", "dark") == "light" else "🌙 Dark Mode"
+    )
 
     st.radio(
         "Theme Mode",
