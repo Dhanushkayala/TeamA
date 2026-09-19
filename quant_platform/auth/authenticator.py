@@ -25,10 +25,10 @@ def _get_config(key: str, default: str = "") -> str:
 
 
 def get_google_credentials():
-    client_id = _get_config("GOOGLE_CLIENT_ID", "")
-    client_secret = _get_config("GOOGLE_CLIENT_SECRET", "")
-    redirect_uri = _get_config("GOOGLE_REDIRECT_URI", "http://localhost:8501")
-    admin_email = _get_config("ADMIN_EMAIL", "admin@example.com")
+    client_id = _get_config("GOOGLE_CLIENT_ID", "").strip()
+    client_secret = _get_config("GOOGLE_CLIENT_SECRET", "").strip()
+    redirect_uri = _get_config("GOOGLE_REDIRECT_URI", "http://localhost:8501").strip().rstrip("/")
+    admin_email = _get_config("ADMIN_EMAIL", "admin@example.com").strip()
     return client_id, client_secret, redirect_uri, admin_email
 
 
