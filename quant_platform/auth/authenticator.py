@@ -19,8 +19,11 @@ load_dotenv()
 
 def _get_config(key: str, default: str = "") -> str:
     """Retrieve config from st.secrets first, then os.getenv, then default."""
-    if hasattr(st, "secrets") and key in st.secrets:
-        return str(st.secrets[key])
+    try:
+        if hasattr(st, "secrets") and key in st.secrets:
+            return str(st.secrets[key])
+    except Exception:
+        pass
     return os.getenv(key, default)
 
 
