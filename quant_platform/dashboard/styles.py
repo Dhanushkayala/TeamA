@@ -19,11 +19,11 @@ def apply_custom_css(theme: str = None) -> None:
         --bg-surface:       #ffffff;
         --bg-elevated:      #f8fafc;
         --bg-hover:         #e2e8f0;
-        --bg-glass:         rgba(255, 255, 255, 0.94);
+        --bg-glass:         rgba(255, 255, 255, 0.97);
         --border:           #cbd5e1;
-        --border-subtle:    rgba(0, 0, 0, 0.08);
+        --border-subtle:    rgba(0, 0, 0, 0.07);
         --border-glow:      rgba(37, 99, 235, 0.25);
-        
+
         --accent-primary:   #2563eb;
         --accent-primary-h: #1d4ed8;
         --accent-cyan:      #0891b2;
@@ -31,16 +31,16 @@ def apply_custom_css(theme: str = None) -> None:
         --accent-danger:    #e11d48;
         --accent-warning:   #d97706;
         --accent-purple:    #7c3aed;
-        
+
         --text-primary:     #0f172a;
         --text-secondary:   #334155;
         --text-muted:       #64748b;
         --text-link:        #2563eb;
-        
+
         --shadow-card:      0 2px 10px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
         --shadow-glow:      0 0 15px rgba(37, 99, 235, 0.12);
         --shadow-dropdown:  0 10px 25px rgba(0, 0, 0, 0.10);
-        
+
         --card-grad:        linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
         --banner-grad:      linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
         --table-header-bg:  #f1f5f9;
@@ -48,10 +48,85 @@ def apply_custom_css(theme: str = None) -> None:
         --scrollbar-thumb:  #cbd5e1;
         """
         app_bg_css = """
-        [data-testid="stAppViewContainer"], .stApp {
+        /* LIGHT MODE — full app background & text */
+        [data-testid="stAppViewContainer"],
+        .stApp,
+        [data-testid="stMain"] {
             background-color: #f1f5f9 !important;
+        }
+        [data-testid="stSidebar"],
+        [data-testid="stSidebar"] > div {
+            background-color: #ffffff !important;
+        }
+
+        /* All Streamlit text elements in light mode */
+        [data-testid="stMain"] p,
+        [data-testid="stMain"] h1,
+        [data-testid="stMain"] h2,
+        [data-testid="stMain"] h3,
+        [data-testid="stMain"] h4,
+        [data-testid="stMain"] h5,
+        [data-testid="stMain"] h6,
+        [data-testid="stMain"] span,
+        [data-testid="stMain"] label {
             color: #0f172a !important;
         }
+        [data-testid="stSidebar"] label,
+        [data-testid="stSidebar"] p,
+        [data-testid="stSidebar"] span {
+            color: #0f172a !important;
+        }
+        [data-testid="stCaptionContainer"] p { color: #64748b !important; }
+        [data-testid="stMetricValue"] { color: #0f172a !important; }
+        [data-testid="stMetricLabel"] { color: #334155 !important; }
+        [data-testid="stMetricDelta"] span { color: inherit !important; }
+
+        /* Light mode inputs */
+        [data-testid="stSelectbox"] > div > div,
+        [data-testid="stSelectbox"] > div > div > div {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+        }
+        [data-testid="stTextInput"] input,
+        [data-testid="stNumberInput"] input,
+        [data-testid="stTextArea"] textarea {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+        }
+        [data-testid="stMultiSelect"] > div > div { background-color: #ffffff !important; }
+        [data-testid="stMultiSelect"] span { color: #0f172a !important; }
+
+        /* Light mode radio & checkbox */
+        .stRadio > div > label > div > p { color: #0f172a !important; }
+        .stCheckbox > label > div > p { color: #0f172a !important; }
+
+        /* Light mode buttons */
+        .stButton > button {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            border-color: #cbd5e1 !important;
+        }
+
+        /* Light mode tabs */
+        [data-testid="stTabs"] button { color: #64748b !important; }
+        [data-testid="stTabs"] button[aria-selected="true"] { color: #2563eb !important; }
+
+        /* Slider labels */
+        [data-testid="stSlider"] p,
+        [data-testid="stSlider"] span[data-testid="stTickBarMin"],
+        [data-testid="stSlider"] span[data-testid="stTickBarMax"] {
+            color: #0f172a !important;
+        }
+
+        /* Date inputs */
+        [data-testid="stDateInput"] input {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+        }
+
+        /* Expander */
+        .streamlit-expanderHeader { background-color: #f8fafc !important; color: #0f172a !important; }
+        .streamlit-expanderContent { background-color: #ffffff !important; }
         """
     else:
         # Dark Theme
@@ -64,7 +139,7 @@ def apply_custom_css(theme: str = None) -> None:
         --border:           #1e2638;
         --border-subtle:    rgba(255, 255, 255, 0.06);
         --border-glow:      rgba(59, 130, 246, 0.35);
-        
+
         --accent-primary:   #3b82f6;
         --accent-primary-h: #2563eb;
         --accent-cyan:      #06b6d4;
@@ -72,16 +147,16 @@ def apply_custom_css(theme: str = None) -> None:
         --accent-danger:    #f43f5e;
         --accent-warning:   #f59e0b;
         --accent-purple:    #8b5cf6;
-        
+
         --text-primary:     #f1f5f9;
         --text-secondary:   #94a3b8;
         --text-muted:       #64748b;
         --text-link:        #38bdf8;
-        
+
         --shadow-card:      0 4px 20px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.2);
         --shadow-glow:      0 0 20px rgba(59, 130, 246, 0.15);
         --shadow-dropdown:  0 10px 30px rgba(0, 0, 0, 0.6);
-        
+
         --card-grad:        linear-gradient(180deg, rgba(22, 27, 34, 0.9) 0%, rgba(16, 21, 28, 0.95) 100%);
         --banner-grad:      linear-gradient(135deg, rgba(18, 23, 32, 0.8) 0%, rgba(14, 18, 26, 0.9) 100%);
         --table-header-bg:  #18202c;
@@ -89,8 +164,30 @@ def apply_custom_css(theme: str = None) -> None:
         --scrollbar-thumb:  #1e2638;
         """
         app_bg_css = """
-        [data-testid="stAppViewContainer"], .stApp {
+        /* DARK MODE — full app background */
+        [data-testid="stAppViewContainer"],
+        .stApp,
+        [data-testid="stMain"] {
             background-color: #0a0d12 !important;
+        }
+        [data-testid="stSidebar"],
+        [data-testid="stSidebar"] > div {
+            background-color: #121720 !important;
+        }
+
+        /* Dark mode inputs */
+        [data-testid="stSelectbox"] > div > div {
+            background-color: #121720 !important;
+            color: #f1f5f9 !important;
+        }
+        [data-testid="stTextInput"] input,
+        [data-testid="stNumberInput"] input,
+        [data-testid="stTextArea"] textarea {
+            background-color: #121720 !important;
+            color: #f1f5f9 !important;
+        }
+        [data-testid="stMultiSelect"] > div > div {
+            background-color: #121720 !important;
             color: #f1f5f9 !important;
         }
         """
@@ -118,12 +215,11 @@ def apply_custom_css(theme: str = None) -> None:
     {app_bg_css}
 
     /* ═══════════════════════════════════════════════════════════════
-       BASE / TYPOGRAPHY
+       BASE / TYPOGRAPHY (non-conflicting with Streamlit widgets)
     ═══════════════════════════════════════════════════════════════ */
-    html, body, [class*="css"] {{
+    html, body {{
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         background-color: var(--bg-base);
-        color: var(--text-primary);
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
     }}
@@ -142,8 +238,10 @@ def apply_custom_css(theme: str = None) -> None:
         letter-spacing: -0.015em;
     }}
 
-    p, span, label, div {{
-        color: var(--text-primary);
+    /* Custom HTML elements use CSS variables — do NOT override Streamlit's native components here */
+    .quant-card *, .section-banner *, .styled-table *, .profile-header *,
+    .achievement-card *, .auth-card *, .sidebar-user-pill * {{
+        color: inherit;
     }}
 
     code, pre, .mono-font, .stMetric [data-testid="stMetricValue"] {{
