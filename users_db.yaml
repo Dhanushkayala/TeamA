@@ -1,0 +1,22 @@
+credentials:
+  usernames:
+    demo:
+      email: demo@quantlab.io
+      name: Demo User
+      password: "$2b$12$HlV6y4NLINtLn/tWEOtkpedisW0OSckOAcKb3aAuSLaNBGNC49DGK"
+      role: user
+    admin:
+      email: admin@quantlab.io
+      name: QuantLab Admin
+      password: "$2b$12$/TqZNXrHgqPGUm3.fmJQHeglxnrIlsZe7zBCU3.4lZRKs8r51Dfh2"
+      role: admin
+
+cookie:
+  expiry_days: 7
+  key: "quantlab_secure_cookie_key_2024_xyz987"
+  name: "quantlab_auth_token"
+
+pre-authorized:
+  emails:
+    - demo@quantlab.io
+    - admin@quantlab.io
