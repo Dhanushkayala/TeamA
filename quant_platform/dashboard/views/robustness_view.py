@@ -138,17 +138,12 @@ def render_robustness_view(asset_df: pd.DataFrame, asset_name: str, active_strat
             yaxis="y2",
         ))
 
+        apply_plotly_theme(fig_cost, title="Transaction Friction vs Strategy Performance", height=380)
         fig_cost.update_layout(
-            template="plotly_dark",
-            paper_bgcolor="#0c1017",
-            plot_bgcolor="#0c1017",
-            height=380,
-            xaxis=dict(title="Transaction Fee (%)", gridcolor="rgba(255, 255, 255, 0.05)"),
-            yaxis=dict(title="Total Return (%)", gridcolor="rgba(255, 255, 255, 0.05)"),
+            xaxis=dict(title="Transaction Fee (%)"),
+            yaxis=dict(title="Total Return (%)"),
             yaxis2=dict(title="Sharpe Ratio", overlaying="y", side="right"),
             hovermode="x unified",
-            margin=dict(l=40, r=40, t=40, b=40),
-            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         )
         st.plotly_chart(fig_cost, use_container_width=True)
         st.dataframe(cost_df, hide_index=True, use_container_width=True)

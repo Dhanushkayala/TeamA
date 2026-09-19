@@ -34,49 +34,99 @@ def get_asset_color(asset_name: str, fallback_idx: int = 0) -> str:
     return _FALLBACK_PALETTE[fallback_idx % len(_FALLBACK_PALETTE)]
 
 
-def apply_plotly_theme(fig: go.Figure, title: Optional[str] = None, height: int = 400) -> go.Figure:
-    """Apply high-end institutional dark theme to any Plotly figure."""
-    fig.update_layout(
-        template="plotly_dark",
-        title=dict(
-            text=title or "",
-            font=dict(size=13, color="#f1f5f9", family="Plus Jakarta Sans, sans-serif"),
-            x=0.01,
-            y=0.97,
-        ),
-        paper_bgcolor="rgba(18, 23, 32, 0.65)",
-        plot_bgcolor="rgba(14, 18, 26, 0.95)",
-        height=height,
-        margin=dict(l=46, r=26, t=48, b=36),
-        font=dict(family="Inter, sans-serif", color="#94a3b8", size=11),
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=1.02,
-            xanchor="right",
-            x=1.0,
-            bgcolor="rgba(0,0,0,0)",
-            font=dict(size=11, color="#cbd5e1"),
-        ),
-        xaxis=dict(
-            gridcolor="rgba(255, 255, 255, 0.04)",
-            zerolinecolor="rgba(255, 255, 255, 0.08)",
-            showgrid=True,
-            linecolor="rgba(255, 255, 255, 0.08)",
-        ),
-        yaxis=dict(
-            gridcolor="rgba(255, 255, 255, 0.04)",
-            zerolinecolor="rgba(255, 255, 255, 0.08)",
-            showgrid=True,
-            linecolor="rgba(255, 255, 255, 0.08)",
-        ),
-        hovermode="x unified",
-        hoverlabel=dict(
-            bgcolor="#18202c",
-            bordercolor="#3b82f6",
-            font=dict(family="JetBrains Mono, monospace", size=11, color="#ffffff"),
-        ),
-    )
+def get_current_theme() -> str:
+    """Return the active UI theme ('dark' or 'light')."""
+    return st.session_state.get("ql_theme", "dark")
+
+
+def apply_plotly_theme(fig: go.Figure, title: Optional[str] = None, height: int = 400, theme: Optional[str] = None) -> go.Figure:
+    """Apply high-end institutional theme (Dark or Light) to any Plotly figure."""
+    active_theme = theme or get_current_theme()
+
+    if active_theme == "light":
+        fig.update_layout(
+            template="plotly_white",
+            title=dict(
+                text=title or "",
+                font=dict(size=13, color="#0f172a", family="Plus Jakarta Sans, sans-serif"),
+                x=0.01,
+                y=0.97,
+            ),
+            paper_bgcolor="rgba(255, 255, 255, 0.95)",
+            plot_bgcolor="#ffffff",
+            height=height,
+            margin=dict(l=46, r=26, t=48, b=36),
+            font=dict(family="Inter, sans-serif", color="#334155", size=11),
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="right",
+                x=1.0,
+                bgcolor="rgba(0,0,0,0)",
+                font=dict(size=11, color="#334155"),
+            ),
+            xaxis=dict(
+                gridcolor="rgba(0, 0, 0, 0.06)",
+                zerolinecolor="rgba(0, 0, 0, 0.12)",
+                showgrid=True,
+                linecolor="rgba(0, 0, 0, 0.12)",
+            ),
+            yaxis=dict(
+                gridcolor="rgba(0, 0, 0, 0.06)",
+                zerolinecolor="rgba(0, 0, 0, 0.12)",
+                showgrid=True,
+                linecolor="rgba(0, 0, 0, 0.12)",
+            ),
+            hovermode="x unified",
+            hoverlabel=dict(
+                bgcolor="#ffffff",
+                bordercolor="#2563eb",
+                font=dict(family="JetBrains Mono, monospace", size=11, color="#0f172a"),
+            ),
+        )
+    else:
+        fig.update_layout(
+            template="plotly_dark",
+            title=dict(
+                text=title or "",
+                font=dict(size=13, color="#f1f5f9", family="Plus Jakarta Sans, sans-serif"),
+                x=0.01,
+                y=0.97,
+            ),
+            paper_bgcolor="rgba(18, 23, 32, 0.65)",
+            plot_bgcolor="rgba(14, 18, 26, 0.95)",
+            height=height,
+            margin=dict(l=46, r=26, t=48, b=36),
+            font=dict(family="Inter, sans-serif", color="#94a3b8", size=11),
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="right",
+                x=1.0,
+                bgcolor="rgba(0,0,0,0)",
+                font=dict(size=11, color="#cbd5e1"),
+            ),
+            xaxis=dict(
+                gridcolor="rgba(255, 255, 255, 0.04)",
+                zerolinecolor="rgba(255, 255, 255, 0.08)",
+                showgrid=True,
+                linecolor="rgba(255, 255, 255, 0.08)",
+            ),
+            yaxis=dict(
+                gridcolor="rgba(255, 255, 255, 0.04)",
+                zerolinecolor="rgba(255, 255, 255, 0.08)",
+                showgrid=True,
+                linecolor="rgba(255, 255, 255, 0.08)",
+            ),
+            hovermode="x unified",
+            hoverlabel=dict(
+                bgcolor="#18202c",
+                bordercolor="#3b82f6",
+                font=dict(family="JetBrains Mono, monospace", size=11, color="#ffffff"),
+            ),
+        )
     return fig
 
 
@@ -185,9 +235,11 @@ def get_active_page() -> str:
 def render_navbar(username: str, display_name: str) -> None:
     """
     Render the sticky top navigation bar.
-    Injects brand, live sync tag, nav page buttons, and a user pill on the right.
+    Injects brand, live sync tag, nav page buttons, user pill, and theme mode toggle.
     """
     active = get_active_page()
+    theme = get_current_theme()
+    theme_toggle_label = "☀️ Light" if theme == "dark" else "🌙 Dark"
     initials = "".join(w[0].upper() for w in (display_name or username).split()[:2])
 
     st.markdown(f"""
@@ -218,12 +270,17 @@ def render_navbar(username: str, display_name: str) -> None:
     </div>
     """, unsafe_allow_html=True)
 
-    cols = st.columns(len(NAV_PAGES), gap="small")
-    for col, (page_key, label) in zip(cols, NAV_PAGES):
+    cols = st.columns([1, 1, 1.1, 1.1, 1.1, 1.1, 1, 1], gap="small")
+    for col, (page_key, label) in zip(cols[:len(NAV_PAGES)], NAV_PAGES):
         with col:
-            btn_class = "ql-nav-btn-active" if active == page_key else "ql-nav-btn"
-            st.markdown(f'<div class="{btn_class}">', unsafe_allow_html=True)
-            if st.button(label, key=f"nav_{page_key}", use_container_width=True):
+            btn_type = "primary" if active == page_key else "secondary"
+            if st.button(label, key=f"nav_{page_key}", use_container_width=True, type=btn_type):
                 st.session_state[_NAV_STATE_KEY] = page_key
                 st.rerun()
-            st.markdown("</div>", unsafe_allow_html=True)
+
+    with cols[-1]:
+        if st.button(theme_toggle_label, key="nav_theme_toggle_btn", use_container_width=True, help="Toggle Light / Dark Mode"):
+            new_theme = "light" if theme == "dark" else "dark"
+            st.session_state["ql_theme"] = new_theme
+            st.session_state["sidebar_theme_radio"] = "☀️ Light Mode" if new_theme == "light" else "🌙 Dark Mode"
+            st.rerun()

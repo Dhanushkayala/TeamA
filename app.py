@@ -62,8 +62,11 @@ from quant_platform.auth.authenticator import render_auth_page, render_logout_bu
 from quant_platform.auth.user_store import save_session
 
 
-# 1. Apply Design System CSS
-apply_custom_css()
+# 1. Theme State & Design System CSS
+if "ql_theme" not in st.session_state:
+    st.session_state["ql_theme"] = "dark"
+
+apply_custom_css(theme=st.session_state["ql_theme"])
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -122,14 +125,30 @@ with st.sidebar:
     <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
         <div style="width:28px; height:28px; border-radius:7px; background:linear-gradient(135deg,#1d4ed8,#6366f1); display:flex; align-items:center; justify-content:center; font-weight:800; color:#fff; font-size:0.85rem;">Q</div>
         <div>
-            <span style="font-size:1.05rem; font-weight:700; color:#e6edf3; font-family:'Plus Jakarta Sans',sans-serif; letter-spacing:-0.02em;">QuantLab</span>
-            <span style="font-size:0.70rem; color:#7d8590; display:block;">Multi-Asset Intelligence</span>
+            <span style="font-size:1.05rem; font-weight:700; color:var(--text-primary); font-family:'Plus Jakarta Sans',sans-serif; letter-spacing:-0.02em;">QuantLab</span>
+            <span style="font-size:0.70rem; color:var(--text-muted); display:block;">Multi-Asset Intelligence</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
+    # Theme Switcher in Sidebar
+    def on_sidebar_theme_change():
+        chosen = st.session_state.get("sidebar_theme_radio", "🌙 Dark Mode")
+        st.session_state["ql_theme"] = "light" if "Light" in chosen else "dark"
+
+    if "sidebar_theme_radio" not in st.session_state:
+        st.session_state["sidebar_theme_radio"] = "☀️ Light Mode" if st.session_state.get("ql_theme", "dark") == "light" else "🌙 Dark Mode"
+
+    st.radio(
+        "Theme Mode",
+        ["🌙 Dark Mode", "☀️ Light Mode"],
+        key="sidebar_theme_radio",
+        horizontal=True,
+        on_change=on_sidebar_theme_change,
+    )
+
     st.markdown("---")
-    st.markdown("<p style='color:#7d8590; font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;'>Universe & Calendar</p>", unsafe_allow_html=True)
+    st.markdown("<p style='color:var(--text-muted); font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;'>Universe & Calendar</p>", unsafe_allow_html=True)
 
     available_defaults = list(DEFAULT_ASSETS.keys())
     selected_assets = st.multiselect(

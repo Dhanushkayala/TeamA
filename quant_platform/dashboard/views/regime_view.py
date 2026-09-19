@@ -65,11 +65,12 @@ def render_regime_view(
 
     fig_reg = go.Figure()
     # Close price line
+    from quant_platform.dashboard.components import get_asset_color
     fig_reg.add_trace(go.Scatter(
         x=classified_df.index,
         y=classified_df["close"],
         name=f"{asset_name} Close",
-        line=dict(color="#ffffff", width=2.0),
+        line=dict(color=get_asset_color(asset_name), width=2.0),
     ))
     # 200 SMA
     if "sma_trend" in classified_df.columns:
