@@ -738,58 +738,58 @@ def apply_custom_css(theme: str = None) -> None:
     }}
 
     /* Segmented Control Standard / Dark Mode Styling */
-    [data-testid="stSegmentedControl"] {
+    [data-testid="stSegmentedControl"] {{
         background-color: var(--bg-surface) !important;
         border: 1px solid var(--border) !important;
         border-radius: var(--radius-sm) !important;
         padding: 2px !important;
         box-shadow: var(--shadow-card) !important;
-    }
-    [data-testid="stSegmentedControl"] > div {
+    }}
+    [data-testid="stSegmentedControl"] > div {{
         background-color: transparent !important;
-    }
+    }}
     [data-testid="stSegmentedControl"] button,
-    [data-testid="stSegmentedControl"] [data-baseweb="tab"] {
+    [data-testid="stSegmentedControl"] [data-baseweb="tab"] {{
         background-color: transparent !important;
         color: var(--text-secondary) !important;
         font-weight: 500 !important;
         font-size: 0.85rem !important;
         border-radius: var(--radius-xs) !important;
         transition: all var(--transition-fast) !important;
-    }
+    }}
     [data-testid="stSegmentedControl"] button:hover,
-    [data-testid="stSegmentedControl"] [data-baseweb="tab"]:hover {
+    [data-testid="stSegmentedControl"] [data-baseweb="tab"]:hover {{
         background-color: var(--bg-hover) !important;
         color: var(--text-primary) !important;
-    }
+    }}
     [data-testid="stSegmentedControl"] button[aria-checked="true"],
     [data-testid="stSegmentedControl"] button[data-checked="true"],
-    [data-testid="stSegmentedControl"] [data-baseweb="tab"][aria-selected="true"] {
+    [data-testid="stSegmentedControl"] [data-baseweb="tab"][aria-selected="true"] {{
         background: var(--accent-primary) !important;
         color: #ffffff !important;
         font-weight: 700 !important;
         box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35) !important;
-    }
+    }}
     [data-testid="stSegmentedControl"] button[aria-checked="true"] p,
-    [data-testid="stSegmentedControl"] [data-baseweb="tab"][aria-selected="true"] p {
+    [data-testid="stSegmentedControl"] [data-baseweb="tab"][aria-selected="true"] p {{
         color: #ffffff !important;
-    }
+    }}
 
     /* Toggle Switch Styling */
-    [data-testid="stToggle"] {
+    [data-testid="stToggle"] {{
         display: flex !important;
         align-items: center !important;
         padding-top: 4px !important;
-    }
-    [data-testid="stToggle"] label {
+    }}
+    [data-testid="stToggle"] label {{
         font-size: 0.82rem !important;
         font-weight: 600 !important;
         color: var(--text-primary) !important;
         cursor: pointer !important;
-    }
+    }}
 
     /* Floating AI Chatbot Button & Badge */
-    .floating-ai-badge {
+    .floating-ai-badge {{
         position: fixed;
         bottom: 84px;
         right: 28px;
@@ -806,11 +806,11 @@ def apply_custom_css(theme: str = None) -> None:
         display: flex;
         align-items: center;
         gap: 6px;
-    }
+    }}
     div[data-testid="stButton"] button:has(div:contains("💬")),
     div[data-testid="stButton"] button:has(p:contains("💬")),
     div[data-testid="stButton"] button:has(div:contains("AI")),
-    button[key="floating_corner_ai_btn"] {
+    button[key="floating_corner_ai_btn"] {{
         position: fixed !important;
         bottom: 24px !important;
         right: 28px !important;
@@ -828,28 +828,28 @@ def apply_custom_css(theme: str = None) -> None:
         justify-content: center !important;
         padding: 0 !important;
         transition: transform var(--transition-fast), box-shadow var(--transition-fast) !important;
-    }
+    }}
     div[data-testid="stButton"] button:has(div:contains("💬")):hover,
     div[data-testid="stButton"] button:has(p:contains("💬")):hover,
     div[data-testid="stButton"] button:has(div:contains("AI")):hover,
-    button[key="floating_corner_ai_btn"]:hover {
+    button[key="floating_corner_ai_btn"]:hover {{
         transform: scale(1.08) !important;
         box-shadow: 0 8px 30px rgba(6, 182, 212, 0.55) !important;
-    }
+    }}
 
     /* Page Fade-In Transition */
-    .ql-page-content {
+    .ql-page-content {{
         animation: fadeIn 200ms ease-out forwards;
-    }
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(4px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
+    }}
+    @keyframes fadeIn {{
+        from {{ opacity: 0; transform: translateY(4px); }}
+        to {{ opacity: 1; transform: translateY(0); }}
+    }}
 
     /* ═══════════════════════════════════════════════════════════════
        BETASCOPE GRAPHICAL LOADING SCREEN
     ═══════════════════════════════════════════════════════════════ */
-    .betascope-loader-wrap {
+    .betascope-loader-wrap {{
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -864,21 +864,21 @@ def apply_custom_css(theme: str = None) -> None:
         text-align: center;
         position: relative;
         overflow: hidden;
-    }
-    .betascope-loader-wrap::before {
+    }}
+    .betascope-loader-wrap::before {{
         content: '';
         position: absolute;
         top: 0; left: 0; right: 0; height: 2px;
         background: linear-gradient(90deg, #2563eb, #06b6d4, #7c3aed, #2563eb);
         background-size: 200% 100%;
         animation: gradientShift 3s linear infinite;
-    }
-    @keyframes gradientShift {
-        0% { background-position: 0% 50%; }
-        100% { background-position: 200% 50%; }
-    }
+    }}
+    @keyframes gradientShift {{
+        0% {{ background-position: 0% 50%; }}
+        100% {{ background-position: 200% 50%; }}
+    }}
 
-    .betascope-loader-core {
+    .betascope-loader-core {{
         position: relative;
         width: 130px;
         height: 130px;
@@ -886,52 +886,52 @@ def apply_custom_css(theme: str = None) -> None:
         display: flex;
         align-items: center;
         justify-content: center;
-    }
-    .radar-ring {
+    }}
+    .radar-ring {{
         position: absolute;
         border-radius: 50%;
         border: 1px dashed rgba(59, 130, 246, 0.4);
-    }
-    .radar-ring-outer {
+    }}
+    .radar-ring-outer {{
         width: 128px;
         height: 128px;
         border: 1px solid rgba(59, 130, 246, 0.25);
         animation: spinSlow 12s linear infinite;
-    }
-    .radar-ring-mid {
+    }}
+    .radar-ring-mid {{
         width: 96px;
         height: 96px;
         border: 1px dashed rgba(6, 182, 212, 0.5);
         animation: spinReverse 8s linear infinite;
-    }
-    .radar-ring-inner {
+    }}
+    .radar-ring-inner {{
         width: 68px;
         height: 68px;
         border: 1px solid rgba(124, 58, 237, 0.4);
         animation: spinSlow 6s linear infinite;
-    }
-    .radar-scanner {
+    }}
+    .radar-scanner {{
         position: absolute;
         width: 128px;
         height: 128px;
         border-radius: 50%;
         background: conic-gradient(from 0deg at 50% 50%, rgba(37, 99, 235, 0.4) 0deg, transparent 60deg, transparent 360deg);
         animation: scanSweep 2s linear infinite;
-    }
-    @keyframes scanSweep {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-    @keyframes spinSlow {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-    @keyframes spinReverse {
-        0% { transform: rotate(360deg); }
-        100% { transform: rotate(0deg); }
-    }
+    }}
+    @keyframes scanSweep {{
+        0% {{ transform: rotate(0deg); }}
+        100% {{ transform: rotate(360deg); }}
+    }}
+    @keyframes spinSlow {{
+        0% {{ transform: rotate(0deg); }}
+        100% {{ transform: rotate(360deg); }}
+    }}
+    @keyframes spinReverse {{
+        0% {{ transform: rotate(360deg); }}
+        100% {{ transform: rotate(0deg); }}
+    }}
 
-    .betascope-logo-sphere {
+    .betascope-logo-sphere {{
         position: relative;
         width: 48px;
         height: 48px;
@@ -942,14 +942,14 @@ def apply_custom_css(theme: str = None) -> None:
         justify-content: center;
         z-index: 2;
         box-shadow: 0 0 20px rgba(37, 99, 235, 0.6);
-    }
-    .betascope-logo-sphere .logo-symbol {
+    }}
+    .betascope-logo-sphere .logo-symbol {{
         font-size: 1.6rem;
         font-weight: 800;
         color: #ffffff;
         font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-    .pulse-aura {
+    }}
+    .pulse-aura {{
         position: absolute;
         width: 100%;
         height: 100%;
@@ -957,50 +957,50 @@ def apply_custom_css(theme: str = None) -> None:
         background: rgba(37, 99, 235, 0.5);
         animation: pulseScale 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         z-index: -1;
-    }
-    @keyframes pulseScale {
-        0%, 100% { transform: scale(1); opacity: 0.8; }
-        50% { transform: scale(1.35); opacity: 0; }
-    }
+    }}
+    @keyframes pulseScale {{
+        0%, 100% {{ transform: scale(1); opacity: 0.8; }}
+        50% {{ transform: scale(1.35); opacity: 0; }}
+    }}
 
-    .loader-brand-title {
+    .loader-brand-title {{
         font-size: 1.4rem;
         font-weight: 800;
         color: var(--text-primary);
         font-family: 'Plus Jakarta Sans', sans-serif;
         letter-spacing: -0.02em;
         margin-bottom: 2px;
-    }
-    .loader-brand-subtitle {
+    }}
+    .loader-brand-subtitle {{
         font-size: 0.72rem;
         font-weight: 600;
         letter-spacing: 0.12em;
         color: var(--accent-cyan);
         text-transform: uppercase;
         margin-bottom: 20px;
-    }
+    }}
 
-    .loader-telemetry-bars {
+    .loader-telemetry-bars {{
         display: flex;
         align-items: flex-end;
         justify-content: center;
         gap: 5px;
         height: 52px;
         margin-bottom: 22px;
-    }
-    .t-bar {
+    }}
+    .t-bar {{
         width: 4px;
         background: linear-gradient(180deg, var(--accent-primary), var(--accent-cyan));
         border-radius: 3px;
         animation: barBounce 1s ease-in-out infinite alternate;
         animation-delay: var(--d);
-    }
-    @keyframes barBounce {
-        0% { height: 6px; opacity: 0.3; }
-        100% { height: var(--h); opacity: 1; }
-    }
+    }}
+    @keyframes barBounce {{
+        0% {{ height: 6px; opacity: 0.3; }}
+        100% {{ height: var(--h); opacity: 1; }}
+    }}
 
-    .loader-status-tag {
+    .loader-status-tag {{
         display: inline-flex;
         align-items: center;
         gap: 8px;
@@ -1009,57 +1009,57 @@ def apply_custom_css(theme: str = None) -> None:
         padding: 5px 14px;
         border-radius: 20px;
         margin-bottom: 16px;
-    }
-    .status-indicator-dot {
+    }}
+    .status-indicator-dot {{
         width: 7px;
         height: 7px;
         border-radius: 50%;
         background: var(--accent-success);
         box-shadow: 0 0 10px var(--accent-success);
         animation: blinkDot 1s infinite alternate;
-    }
-    @keyframes blinkDot {
-        0% { opacity: 0.4; }
-        100% { opacity: 1; }
-    }
-    .status-msg {
+    }}
+    @keyframes blinkDot {{
+        0% {{ opacity: 0.4; }}
+        100% {{ opacity: 1; }}
+    }}
+    .status-msg {{
         font-size: 0.78rem;
         font-weight: 600;
         color: var(--text-primary);
         font-family: 'JetBrains Mono', monospace;
         letter-spacing: 0.04em;
-    }
+    }}
 
-    .loader-progress-track {
+    .loader-progress-track {{
         width: 240px;
         height: 4px;
         background: var(--border);
         border-radius: 2px;
         overflow: hidden;
         margin-bottom: 18px;
-    }
-    .loader-progress-fill {
+    }}
+    .loader-progress-fill {{
         width: 100%;
         height: 100%;
         background: linear-gradient(90deg, #2563eb, #06b6d4, #7c3aed);
         background-size: 200% 100%;
         animation: progressMove 1.5s linear infinite;
-    }
-    @keyframes progressMove {
-        0% { transform: translateX(-100%); }
-        100% { transform: translateX(100%); }
-    }
+    }}
+    @keyframes progressMove {{
+        0% {{ transform: translateX(-100%); }}
+        100% {{ transform: translateX(100%); }}
+    }}
 
-    .loader-node-info {
+    .loader-node-info {{
         display: flex;
         gap: 16px;
         font-size: 0.68rem;
         color: var(--text-muted);
         font-family: 'JetBrains Mono', monospace;
-    }
+    }}
 
     /* Footer Disclaimer */
-    .quant-disclaimer {
+    .quant-disclaimer {{
         margin-top: 40px;
         padding: 12px 18px;
         background: var(--bg-surface);
@@ -1069,7 +1069,7 @@ def apply_custom_css(theme: str = None) -> None:
         color: var(--text-muted);
         text-align: center;
         line-height: 1.5;
-    }
+    }}
     </style>
     """, unsafe_allow_html=True)
 
