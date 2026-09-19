@@ -15,7 +15,7 @@ from quant_platform.dashboard.components import apply_plotly_theme, render_secti
 
 def render_correlation_view(aligned_close: pd.DataFrame):
     render_section_banner(
-        icon="🔗",
+        icon="",
         title="Cross-Asset Correlation & Diversification Matrix",
         subtitle="Examine static linear/rank dependency matrices and time-varying rolling correlations across multi-asset returns.",
         badge_text=f"{len(aligned_close.columns)} Assets Synchronized",
@@ -82,7 +82,7 @@ def render_correlation_view(aligned_close: pd.DataFrame):
 
     # 2. Dynamic Diversification Insights
     st.markdown("---")
-    st.markdown("#### 💡 Pairwise Diversification Intelligence")
+    st.markdown("####  Pairwise Diversification Intelligence")
     
     cols = list(corr_mat.columns)
     pair_list = []
@@ -98,7 +98,7 @@ def render_correlation_view(aligned_close: pd.DataFrame):
         for idx, (a1, a2) in enumerate(display_pairs):
             val = corr_mat.loc[a1, a2]
             border_c = "#10b981" if val < 0.2 else ("#f59e0b" if val < 0.6 else "#f43f5e")
-            badge_desc = "🛡️ Decoupled / Strong Hedge" if val < 0.2 else ("⚡ Moderate Co-movement" if val < 0.6 else "⚠️ High Co-movement Risk")
+            badge_desc = " Decoupled / Strong Hedge" if val < 0.2 else (" Moderate Co-movement" if val < 0.6 else " High Co-movement Risk")
             with insights_cols[idx % n_cols]:
                 st.markdown(f"""
                 <div class="quant-card" style="border-top: 3px solid {border_c};">

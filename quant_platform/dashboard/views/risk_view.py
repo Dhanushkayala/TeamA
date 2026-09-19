@@ -27,7 +27,7 @@ from quant_platform.dashboard.components import (
 
 def render_risk_view(aligned_close: pd.DataFrame, risk_free_rate: float = 0.04):
     render_section_banner(
-        icon="⚡",
+        icon="",
         title="Returns & Risk Distribution Analytics",
         subtitle="Analyze volatility clustering, tail risk, rolling Sharpe stability, and drawdown depths across the universe.",
         badge_text="Risk Suite Active",
@@ -62,15 +62,15 @@ def render_risk_view(aligned_close: pd.DataFrame, risk_free_rate: float = 0.04):
             st.markdown(f"""
             <div class="quant-card" style="border-top: 3px solid {color};">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                    <span style="font-weight:700; color:#f1f5f9; font-size:0.90rem;">{col}</span>
+                    <span style="font-weight:700; color:var(--text-primary); font-size:0.90rem;">{col}</span>
                     <span style="font-size:0.75rem; color:{color}; font-weight:700; font-family:'JetBrains Mono',monospace;">Vol {vol:.1f}%</span>
                 </div>
-                <div style="font-size:1.45rem; font-weight:800; color:#ffffff; font-family:'JetBrains Mono',monospace;">
+                <div style="font-size:1.45rem; font-weight:800; color:var(--text-primary); font-family:'JetBrains Mono',monospace;">
                     Sharpe {shp:.2f}
                 </div>
-                <div style="display:flex; justify-content:space-between; margin-top:8px; padding-top:6px; border-top:1px solid rgba(255,255,255,0.05); font-size:0.78rem; color:#94a3b8; font-family:'JetBrains Mono',monospace;">
-                    <span>Sortino: <strong style="color:#f1f5f9;">{sortino:.2f}</strong></span>
-                    <span>Calmar: <strong style="color:#f1f5f9;">{calmar:.2f}</strong></span>
+                <div style="display:flex; justify-content:space-between; margin-top:8px; padding-top:6px; border-top:1px solid var(--border-subtle); font-size:0.78rem; color:var(--text-secondary); font-family:'JetBrains Mono',monospace;">
+                    <span>Sortino: <strong style="color:var(--text-primary);">{sortino:.2f}</strong></span>
+                    <span>Calmar: <strong style="color:var(--text-primary);">{calmar:.2f}</strong></span>
                 </div>
                 <div style="font-size:0.74rem; color:#f43f5e; margin-top:4px; font-family:'JetBrains Mono',monospace;">
                     Max Drawdown: {mdd:.2f}%
@@ -134,7 +134,7 @@ def render_risk_view(aligned_close: pd.DataFrame, risk_free_rate: float = 0.04):
 
     # 4. Drawdown Series (Underwater Chart)
     st.markdown("---")
-    st.markdown("#### 🌊 Underwater Drawdown Profiles (%)")
+    st.markdown("####  Underwater Drawdown Profiles (%)")
     fig_dd = go.Figure()
     for i, col in enumerate(aligned_close.columns):
         color = get_asset_color(col, i)

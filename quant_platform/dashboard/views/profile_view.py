@@ -17,7 +17,7 @@ def render_profile_view(username: str, display_name: str) -> None:
         badge_text="USER REPUTATION & AUDIT",
     )
 
-    # ── Profile Header ────────────────────────────────────────────────────────
+    #  Profile Header 
     st.markdown(f"""
     <div class="profile-header">
         <div class="profile-avatar">{initials}</div>
@@ -27,10 +27,10 @@ def render_profile_view(username: str, display_name: str) -> None:
                 @{username} &nbsp;·&nbsp; Member since {profile.get("joined", "—")}
             </div>
             <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
-                <span class="quant-badge quant-badge-blue">⚡ {profile.get("total_sessions", 0)} Sessions</span>
-                <span class="quant-badge quant-badge-gold">📊 {len(profile.get("assets_analyzed", []))} Assets</span>
+                <span class="quant-badge quant-badge-blue"> {profile.get("total_sessions", 0)} Sessions</span>
+                <span class="quant-badge quant-badge-gold"> {len(profile.get("assets_analyzed", []))} Assets</span>
                 <span class="quant-badge quant-badge-purple">🧭 {len(profile.get("strategies_run", {}))} Strategies</span>
-                <span class="quant-badge quant-badge-green">🏅 {len(profile.get("achievements", []))} Achievements</span>
+                <span class="quant-badge quant-badge-green"> {len(profile.get("achievements", []))} Achievements</span>
             </div>
         </div>
     </div>
@@ -38,11 +38,11 @@ def render_profile_view(username: str, display_name: str) -> None:
 
     col_left, col_right = st.columns([1, 1], gap="large")
 
-    # ── Left Column: Stats ────────────────────────────────────────────────────
+    #  Left Column: Stats 
     with col_left:
         st.markdown("""
         <div class="section-header">
-            <div class="section-header-icon">📈</div>
+            <div class="section-header-icon"></div>
             <div class="section-header-text">
                 <h4>Platform Stats</h4>
                 <p>Your quantitative research summary</p>
@@ -63,7 +63,7 @@ def render_profile_view(username: str, display_name: str) -> None:
                 render_metric_card("Best Backtest Sharpe", "—", "No sessions recorded", color="default")
 
 
-    # ── Right Column: Achievements ────────────────────────────────────────────
+    #  Right Column: Achievements 
     with col_right:
         earned_ids = set(profile.get("achievements", []))
         earned = [a for k, a in ACHIEVEMENTS.items() if k in earned_ids]
@@ -71,7 +71,7 @@ def render_profile_view(username: str, display_name: str) -> None:
 
         st.markdown("""
         <div class="section-header">
-            <div class="section-header-icon">🏅</div>
+            <div class="section-header-icon"></div>
             <div class="section-header-text">
                 <h4>Achievements</h4>
                 <p>Unlock by exploring the platform</p>
@@ -99,7 +99,7 @@ def render_profile_view(username: str, display_name: str) -> None:
             )
 
         if locked:
-            with st.expander(f"🔒 {len(locked)} Locked Achievements"):
+            with st.expander(f" {len(locked)} Locked Achievements"):
                 for ach in locked:
                     st.markdown(f"""
                     <div class="achievement-card" style="opacity:0.45; filter:grayscale(0.6);">
@@ -113,10 +113,10 @@ def render_profile_view(username: str, display_name: str) -> None:
                     <div style="height:6px;"></div>
                     """, unsafe_allow_html=True)
 
-    # ── Session History ───────────────────────────────────────────────────────
+    #  Session History 
     st.markdown("""
     <div class="section-header">
-        <div class="section-header-icon">🕐</div>
+        <div class="section-header-icon"></div>
         <div class="section-header-text">
             <h4>Recent Session History</h4>
             <p>Your last 10 backtest sessions</p>

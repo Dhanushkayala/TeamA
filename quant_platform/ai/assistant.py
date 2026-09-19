@@ -165,8 +165,8 @@ def chat_with_quant_agent(
     asset_macro = context_payload.get("asset_macro_summary", {})
     robustness_data = context_payload.get("robustness_metrics", {})
 
-    system_prompt = f"""You are QuantBot, an elite Quantitative Research Analyst & Systematic Portfolio Manager at a Tier-1 quantitative trading firm.
-You have COMPLETE, comprehensive mastery of this entire quantitative intelligence and backtesting platform ('QuantLab').
+    system_prompt = f"""You are BetaScope AI, an elite Quantitative Research Analyst & Systematic Portfolio Manager at a Tier-1 quantitative trading firm.
+You have COMPLETE, comprehensive mastery of this entire quantitative intelligence and backtesting platform ('BetaScope').
 
 === PLATFORM ARCHITECTURE & WEBSITE CAPABILITIES ===
 1. 🏠 Overview Tab: Multi-asset normalized comparisons (base-100), price action, cumulative return, volatility, Sharpe, and drawdown metrics across Gold, Bitcoin, NVIDIA, and custom tickers.
@@ -219,7 +219,7 @@ You have COMPLETE, comprehensive mastery of this entire quantitative intelligenc
                     contents.append({"role": role, "parts": [{"text": content}]})
 
                 if not contents:
-                    contents = [{"role": "user", "parts": [{"text": f"{system_prompt}\n\nHello, QuantBot."}]}]
+                    contents = [{"role": "user", "parts": [{"text": f"{system_prompt}\n\nHello, BetaScope AI."}]}]
 
                 headers = {"Content-Type": "application/json"}
                 body = {

@@ -1,1 +1,1 @@
-"""Auth package for QuantLab platform."""
+"""Auth package for BetaScope platform."""

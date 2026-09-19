@@ -19,3 +19,5 @@ __all__ = [
     "render_ai_view",
     "render_profile_view",
 ]
+
+from .admin_view import render_admin_view

@@ -21,7 +21,7 @@ def render_ai_view(
     <div class="chat-app-header">
         <div>
             <div class="chat-app-title">
-                <div style="width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg, #0d9488 0%, #2563eb 100%); display:flex; align-items:center; justify-content:center; font-size:1.1rem;">🤖</div>
+                <div style="width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg, #0d9488 0%, #2563eb 100%); display:flex; align-items:center; justify-content:center; font-size:1.1rem;"></div>
                 <span>QuantAnalyst</span>
             </div>
             <div class="chat-app-subtitle">
@@ -29,7 +29,7 @@ def render_ai_view(
             </div>
         </div>
         <div>
-            <span class="chat-context-pill">⚡ Synced: {asset_name} ({strategy_name})</span>
+            <span class="chat-context-pill"> Synced: {asset_name} ({strategy_name})</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -43,12 +43,12 @@ def render_ai_view(
 
     # 1. Model & Provider Settings Expander (Visible ONLY when unlocked via KD@114)
     if show_settings:
-        with st.expander("⚙️ LLM Provider & Model Settings (Admin Unlocked)", expanded=True):
+        with st.expander(" LLM Provider & Model Settings (Admin Unlocked)", expanded=True):
             col_hdr1, col_hdr2 = st.columns([4, 1])
             with col_hdr1:
-                st.caption("🔒 Admin Mode Active • Type `hide` or click button to re-hide.")
+                st.caption(" Admin Mode Active • Type `hide` or click button to re-hide.")
             with col_hdr2:
-                if st.button("🔒 Hide Settings", key="btn_hide_llm_settings", use_container_width=True):
+                if st.button(" Hide Settings", key="btn_hide_llm_settings", use_container_width=True):
                     st.session_state["show_admin_llm_settings"] = False
                     st.rerun()
 
@@ -133,29 +133,29 @@ def render_ai_view(
         ]
 
     # Interactive Selectable Choice Chips Grid (Screenshot Style)
-    st.markdown("<p style='font-size:0.82rem; color:#94a3b8; font-weight:600; margin-bottom:6px;'>⚡ QUICK SELECTION TOPICS:</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:0.82rem; color:#94a3b8; font-weight:600; margin-bottom:6px;'> QUICK SELECTION TOPICS:</p>", unsafe_allow_html=True)
     
     chip_prompt = None
     c_col1, c_col2, c_col3, c_col4 = st.columns(4)
     with c_col1:
-        if st.button("🛡️ Drawdown Risk", key="chip_drawdown", width="stretch"):
+        if st.button(" Drawdown Risk", key="chip_drawdown", width="stretch"):
             chip_prompt = f"Analyze the drawdown risk, downside volatility, and capital preservation of {strategy_name} on {asset_name} relative to the benchmark."
-        if st.button("🌪️ Market Regimes", key="chip_regimes", width="stretch"):
+        if st.button(" Market Regimes", key="chip_regimes", width="stretch"):
             chip_prompt = f"How did {strategy_name} perform across Bull vs Bear and Low vs High Volatility regimes on {asset_name}?"
     with c_col2:
-        if st.button("⚙️ Optimize Parameters", key="chip_tune", width="stretch"):
+        if st.button(" Optimize Parameters", key="chip_tune", width="stretch"):
             chip_prompt = f"Based on current backtest metrics, suggest optimal parameter tweaks and risk filters to boost the Sharpe ratio."
-        if st.button("🌐 Correlation Risks", key="chip_corr", width="stretch"):
+        if st.button(" Correlation Risks", key="chip_corr", width="stretch"):
             chip_prompt = f"Evaluate cross-asset correlation risks between {asset_name} and other assets in the portfolio."
     with c_col3:
-        if st.button("📊 Sharpe & Volatility", key="chip_sharpe", width="stretch"):
+        if st.button(" Sharpe & Volatility", key="chip_sharpe", width="stretch"):
             chip_prompt = f"Compare the risk-adjusted Sharpe, Sortino, and volatility metrics of {strategy_name} on {asset_name} vs Buy & Hold."
-        if st.button("🎲 Monte Carlo Test", key="chip_mc", width="stretch"):
+        if st.button(" Monte Carlo Test", key="chip_mc", width="stretch"):
             chip_prompt = f"Explain how the Monte Carlo 500-path simulation and bootstrap confidence intervals evaluate strategy robustness."
     with c_col4:
-        if st.button("📄 Full Report", key="chip_report", width="stretch"):
+        if st.button(" Full Report", key="chip_report", width="stretch"):
             chip_prompt = f"Generate a full executive quantitative research report for {strategy_name} on {asset_name}."
-        if st.button("💡 Risk-Managed Sizing", key="chip_sizing", width="stretch"):
+        if st.button(" Risk-Managed Sizing", key="chip_sizing", width="stretch"):
             chip_prompt = f"How should I adjust position sizing or trailing stops during Bear and High Volatility regimes?"
 
     # Bottom Form Input Field (Screenshot Design with rounded text box & Send button)
@@ -169,7 +169,7 @@ def render_ai_view(
                 key="input_user_query",
             )
         with f_c2:
-            form_submit = st.form_submit_button("Send ➔", width="stretch")
+            form_submit = st.form_submit_button("Send ", width="stretch")
 
     active_prompt = chip_prompt or (user_text.strip() if form_submit and user_text.strip() else None)
 
@@ -181,7 +181,7 @@ def render_ai_view(
             st.session_state["quant_chat_messages"].append({"role": "user", "content": "KD@114"})
             st.session_state["quant_chat_messages"].append({
                 "role": "assistant",
-                "content": "🔓 **Admin Settings Unlocked**: `⚙️ LLM Provider & Model Settings` panel is now visible above. You can configure custom LLM providers, model architectures, and API keys.",
+                "content": " **Admin Settings Unlocked**: ` LLM Provider & Model Settings` panel is now visible above. You can configure custom LLM providers, model architectures, and API keys.",
             })
             st.rerun()
         elif cleaned_cmd.lower() in ["hide llm", "lock llm", "hide settings"] and show_settings:
@@ -189,7 +189,7 @@ def render_ai_view(
             st.session_state["quant_chat_messages"].append({"role": "user", "content": cleaned_cmd})
             st.session_state["quant_chat_messages"].append({
                 "role": "assistant",
-                "content": "🔒 **Admin Settings Hidden**: `⚙️ LLM Provider & Model Settings` has been hidden.",
+                "content": " **Admin Settings Hidden**: ` LLM Provider & Model Settings` has been hidden.",
             })
             st.rerun()
 
@@ -217,7 +217,7 @@ def render_ai_view(
                 with st.chat_message("user"):
                     st.markdown(msg["content"])
             else:
-                with st.chat_message("assistant", avatar="🤖"):
+                with st.chat_message("assistant", avatar=""):
                     st.markdown(msg["content"])
 
 
@@ -234,4 +234,4 @@ def render_ai_view(
             ]
             st.rerun()
     with b_c2:
-        st.caption("💡 *Tip: Click any quick-action topic chip above or type your question in the search bar.*")
+        st.caption(" *Tip: Click any quick-action topic chip above or type your question in the search bar.*")

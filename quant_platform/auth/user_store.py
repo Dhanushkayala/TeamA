@@ -1,5 +1,5 @@
 """
-Per-user profile persistence for QuantLab.
+Per-user profile persistence for BetaScope.
 
 Stores a JSON file per user at: data/users/{username}.json
 
@@ -7,7 +7,7 @@ Schema:
 {
   "username": "demo",
   "display_name": "Demo User",
-  "email": "demo@quantlab.io",
+  "email": "demo@betascope.io",
   "joined": "2024-01-01",
   "total_sessions": 3,
   "assets_analyzed": ["Gold", "Bitcoin", "NVIDIA"],
@@ -48,7 +48,7 @@ ACHIEVEMENTS = {
     "first_session": {
         "id": "first_session",
         "title": "First Launch",
-        "description": "Completed your first QuantLab session",
+        "description": "Completed your first BetaScope session",
         "icon": "🚀",
         "rarity": "common",
     },
@@ -82,7 +82,7 @@ ACHIEVEMENTS = {
     },
     "veteran": {
         "id": "veteran",
-        "title": "QuantLab Veteran",
+        "title": "BetaScope Veteran",
         "description": "Completed 10 or more sessions",
         "icon": "🏆",
         "rarity": "epic",

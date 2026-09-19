@@ -9,8 +9,8 @@ import pandas as pd
 import numpy as np
 
 st.set_page_config(
-    page_title="QuantLab | Quantitative Multi-Asset Intelligence",
-    page_icon="Q",
+    page_title="BetaScope | Quantitative Multi-Asset Intelligence",
+    page_icon="β",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -47,6 +47,7 @@ from quant_platform.dashboard.components import (
     render_navbar,
     get_active_page,
 )
+from quant_platform.dashboard.loader import get_loader_html
 from quant_platform.dashboard.views import (
     render_overview_view,
     render_risk_view,
@@ -56,8 +57,9 @@ from quant_platform.dashboard.views import (
     render_regime_view,
     render_ai_view,
     render_profile_view,
+    render_admin_view,
 )
-from quant_platform.auth.authenticator import render_auth_page, render_logout_button, get_auth_state
+from quant_platform.auth.authenticator import render_auth_page, render_logout_button, get_auth_state, get_user_role
 from quant_platform.auth.user_store import save_session
 
 
@@ -72,6 +74,7 @@ apply_custom_css(theme=st.session_state["ql_theme"])
 # 2. AUTHENTICATION GATE
 # ─────────────────────────────────────────────────────────────────────────────
 is_authenticated, current_name, current_username = get_auth_state()
+current_role = get_user_role()
 
 if not is_authenticated:
     is_authenticated, current_name, current_username = render_auth_page()
@@ -122,31 +125,27 @@ with st.sidebar:
 
     st.markdown("""
     <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
-        <div style="width:28px; height:28px; border-radius:7px; background:linear-gradient(135deg,#1d4ed8,#6366f1); display:flex; align-items:center; justify-content:center; font-weight:800; color:#fff; font-size:0.85rem;">Q</div>
+        <div style="width:28px; height:28px; border-radius:7px; background:linear-gradient(135deg,#1d4ed8,#6366f1); display:flex; align-items:center; justify-content:center; font-weight:800; color:#fff; font-size:1.0rem;">&beta;</div>
         <div>
-            <span style="font-size:1.05rem; font-weight:700; color:var(--text-primary); font-family:'Plus Jakarta Sans',sans-serif; letter-spacing:-0.02em;">QuantLab</span>
+            <span style="font-size:1.05rem; font-weight:700; color:var(--text-primary); font-family:'Plus Jakarta Sans',sans-serif; letter-spacing:-0.02em;">BetaScope</span>
             <span style="font-size:0.70rem; color:var(--text-muted); display:block;">Multi-Asset Intelligence</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-    # Theme Switcher in Sidebar
-    def on_sidebar_theme_change():
-        chosen = st.session_state.get("sidebar_theme_radio", "Dark Mode")
-        st.session_state["ql_theme"] = "light" if "Light" in chosen else "dark"
+    # Theme Switcher in Sidebar as a Toggle
+    def on_sidebar_theme_toggle():
+        is_light = st.session_state.get("sidebar_theme_toggle", False)
+        st.session_state["ql_theme"] = "light" if is_light else "dark"
 
-    # Always mirror ql_theme into the radio key BEFORE the widget is created.
-    # This is the only safe place to write to a widget's session-state key.
-    st.session_state["sidebar_theme_radio"] = (
-        "Light Mode" if st.session_state.get("ql_theme", "dark") == "light" else "Dark Mode"
+    st.session_state["sidebar_theme_toggle"] = (
+        st.session_state.get("ql_theme", "dark") == "light"
     )
 
-    st.radio(
-        "Theme Mode",
-        ["Dark Mode", "Light Mode"],
-        key="sidebar_theme_radio",
-        horizontal=True,
-        on_change=on_sidebar_theme_change,
+    st.toggle(
+        "Light Mode" if st.session_state.get("ql_theme", "dark") == "light" else "Dark Mode",
+        key="sidebar_theme_toggle",
+        on_change=on_sidebar_theme_toggle,
     )
 
     st.markdown("---")
@@ -262,19 +261,29 @@ with st.sidebar:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 5. FETCH AND ALIGN DATA
+# 5. FETCH AND ALIGN DATA WITH GRAPHICAL LOADER
 # ─────────────────────────────────────────────────────────────────────────────
 if not selected_assets and not custom_tickers:
     st.error("Please select at least one asset in the sidebar.")
     st.stop()
 
-with st.spinner("Synchronizing multi-asset feeds…"):
-    aligned_dfs, aligned_close, fill_stats, sources_info = load_multi_asset_data(
-        assets_list=tuple(selected_assets),
-        start_date=start_date_val.strftime("%Y-%m-%d"),
-        end_date=end_date_val.strftime("%Y-%m-%d"),
-        custom_tickers_tuple=custom_tickers,
-    )
+# High-Tech Graphical Loading Screen during Multi-Asset Synchronization
+loader_placeholder = st.empty()
+asset_count = len(selected_assets) + len(custom_tickers)
+loader_placeholder.markdown(
+    get_loader_html(f"SYNCHRONIZING {asset_count} MULTI-ASSET FEEDS & CALIBRATING ENGINE..."),
+    unsafe_allow_html=True,
+)
+
+aligned_dfs, aligned_close, fill_stats, sources_info = load_multi_asset_data(
+    assets_list=tuple(selected_assets),
+    start_date=start_date_val.strftime("%Y-%m-%d"),
+    end_date=end_date_val.strftime("%Y-%m-%d"),
+    custom_tickers_tuple=custom_tickers,
+)
+
+# Clear loader once synchronizing is complete
+loader_placeholder.empty()
 
 if aligned_close.empty or target_asset not in aligned_dfs:
     st.error(f"Could not load sufficient data for '{target_asset}'. Please check the date range.")
@@ -345,7 +354,7 @@ if not st.session_state.get(_session_key, False):
 # ─────────────────────────────────────────────────────────────────────────────
 # 8. AI ASSISTANT DIALOG
 # ─────────────────────────────────────────────────────────────────────────────
-@st.dialog("🤖 QuantBot — AI Quantitative Assistant", width="large")
+@st.dialog("🤖 BetaScope AI — Quantitative Analyst", width="large")
 def show_ai_dialog(
     asset_name: str,
     strategy_name: str,
@@ -370,7 +379,7 @@ def show_ai_dialog(
 # ─────────────────────────────────────────────────────────────────────────────
 # 9. TOP NAVIGATION BAR + PAGE ROUTING
 # ─────────────────────────────────────────────────────────────────────────────
-render_navbar(username=current_username, display_name=current_name)
+render_navbar(username=current_username, display_name=current_name, role=current_role)
 
 active_page = get_active_page()
 
@@ -424,6 +433,9 @@ elif active_page == "profile":
         display_name=current_name,
     )
 
+elif active_page == "admin":
+    render_admin_view()
+
 st.markdown('</div>', unsafe_allow_html=True)
 
 
@@ -432,14 +444,14 @@ st.markdown('</div>', unsafe_allow_html=True)
 # ─────────────────────────────────────────────────────────────────────────────
 st.markdown(f"""
 <div class="floating-ai-badge">
-    <span class="online-indicator"></span> QuantBot &nbsp;·&nbsp; {target_asset}
+    <span class="online-indicator"></span> BetaScope AI &nbsp;·&nbsp; {target_asset}
 </div>
 """, unsafe_allow_html=True)
 
 floating_clicked = st.button(
-    "AI",
+    "💬",
     key="floating_corner_ai_btn",
-    help="Chat with QuantBot AI Quantitative Analyst",
+    help="Chat with BetaScope AI Quantitative Analyst",
 )
 
 if floating_clicked:
@@ -459,3 +471,4 @@ if floating_clicked:
 # 11. FOOTER DISCLAIMER
 # ─────────────────────────────────────────────────────────────────────────────
 render_disclaimer_footer()
+

@@ -36,7 +36,7 @@ def render_robustness_view(asset_df: pd.DataFrame, asset_name: str, active_strat
         with c_grid1:
             fast_windows = st.multiselect("Fast Lookback Windows", [5, 10, 15, 20, 25, 30, 40, 50], default=[5, 10, 20, 30, 50])
             slow_windows = st.multiselect("Slow Lookback Windows", [30, 50, 75, 100, 150, 200], default=[30, 50, 100, 150, 200])
-            run_btn = st.button("🚀 Run Parameter Grid Sweep", key="btn_sweep", use_container_width=True)
+            run_btn = st.button(" Run Parameter Grid Sweep", key="btn_sweep", use_container_width=True)
 
         if run_btn or "cached_sweep" not in st.session_state:
             with st.spinner("Computing parameter grid simulations..."):
@@ -178,16 +178,16 @@ def render_robustness_view(asset_df: pd.DataFrame, asset_name: str, active_strat
 
         st.markdown(f"""
         <div style="background: rgba(18, 23, 32, 0.7); border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 8px; padding: 10px 16px; margin: 12px 0; font-size: 0.84rem; color: #94a3b8;">
-            📅 <strong>Split Boundary:</strong> <span style="color: #06b6d4; font-family: 'JetBrains Mono', monospace;">{tt_res['split_date']}</span> &nbsp;·&nbsp;
+             <strong>Split Boundary:</strong> <span style="color: #06b6d4; font-family: 'JetBrains Mono', monospace;">{tt_res['split_date']}</span> &nbsp;·&nbsp;
             <strong>Diagnostic:</strong> <span style="color: #f1f5f9;">{overfit_risk[2]}</span>
         </div>
         """, unsafe_allow_html=True)
 
         c_tr, c_te = st.columns(2)
         with c_tr:
-            st.markdown("##### 🟢 In-Sample (Train) Metrics")
+            st.markdown("#####  In-Sample (Train) Metrics")
             st.dataframe(pd.DataFrame([tt_res["train_metrics"]]).T.rename(columns={0: "Value"}), use_container_width=True)
         with c_te:
-            st.markdown("##### 🔵 Out-of-Sample (Test) Metrics")
+            st.markdown("#####  Out-of-Sample (Test) Metrics")
             st.dataframe(pd.DataFrame([tt_res["test_metrics"]]).T.rename(columns={0: "Value"}), use_container_width=True)
 

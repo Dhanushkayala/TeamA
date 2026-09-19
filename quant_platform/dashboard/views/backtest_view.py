@@ -12,7 +12,7 @@ from quant_platform.dashboard.components import apply_plotly_theme, get_asset_co
 
 def render_backtest_view(result: BacktestResult, asset_df: pd.DataFrame):
     render_section_banner(
-        icon="⚙️",
+        icon="",
         title=f"Backtest Execution: {result.strategy_name} on {result.asset_name}",
         subtitle="Simulated execution with realistic (t+1) fill lag, transaction friction, slippage, and position sizing.",
         badge_text=f"Initial: ${result.initial_capital:,.0f} • Trades: {len(result.trades)}",
@@ -31,7 +31,7 @@ def render_backtest_view(result: BacktestResult, asset_df: pd.DataFrame):
         <div class="quant-card" style="border-top: 3px solid {ret_color};">
             <div class="quant-card-title">Total Return / CAGR</div>
             <div class="quant-card-value" style="color:{ret_color};">{tot_ret:+.2f}%</div>
-            <div class="quant-card-sub">CAGR: <strong style="color:#f1f5f9;">{sm['CAGR (%)']:.2f}%</strong> (Bench: {bm['Total Return (%)']:+.1f}%)</div>
+            <div class="quant-card-sub">CAGR: <strong style="color:var(--text-primary);">{sm['CAGR (%)']:.2f}%</strong> (Bench: {bm['Total Return (%)']:+.1f}%)</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -42,7 +42,7 @@ def render_backtest_view(result: BacktestResult, asset_df: pd.DataFrame):
         <div class="quant-card" style="border-top: 3px solid #3b82f6;">
             <div class="quant-card-title">Sharpe & Sortino</div>
             <div class="quant-card-value" style="color:#38bdf8;">{shp:.2f}</div>
-            <div class="quant-card-sub">Sortino: <strong style="color:#f1f5f9;">{sort:.2f}</strong> (Bench Sharpe: {bm['Sharpe Ratio']:.2f})</div>
+            <div class="quant-card-sub">Sortino: <strong style="color:var(--text-primary);">{sort:.2f}</strong> (Bench Sharpe: {bm['Sharpe Ratio']:.2f})</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -54,7 +54,7 @@ def render_backtest_view(result: BacktestResult, asset_df: pd.DataFrame):
         <div class="quant-card" style="border-top: 3px solid {mdd_color};">
             <div class="quant-card-title">Drawdown / Calmar</div>
             <div class="quant-card-value" style="color:{mdd_color};">{mdd:.2f}%</div>
-            <div class="quant-card-sub">Calmar: <strong style="color:#f1f5f9;">{calm:.2f}</strong> (Bench MDD: {bm['Max Drawdown (%)']:.1f}%)</div>
+            <div class="quant-card-sub">Calmar: <strong style="color:var(--text-primary);">{calm:.2f}</strong> (Bench MDD: {bm['Max Drawdown (%)']:.1f}%)</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -97,7 +97,7 @@ def render_backtest_view(result: BacktestResult, asset_df: pd.DataFrame):
 
     # 3. Price Chart with Buy / Sell Execution Markers
     st.markdown("---")
-    st.markdown("#### 🎯 Trade Execution Markers on Price")
+    st.markdown("####  Trade Execution Markers on Price")
     
     fig_trades = go.Figure()
     fig_trades.add_trace(go.Scatter(
@@ -137,18 +137,18 @@ def render_backtest_view(result: BacktestResult, asset_df: pd.DataFrame):
 
     # 4. Detailed Strategy vs Benchmark Comparison Scorecard
     st.markdown("---")
-    st.markdown("#### 📋 Strategy vs Benchmark Quantitative Scorecard")
+    st.markdown("####  Strategy vs Benchmark Quantitative Scorecard")
     summary_df = calculate_performance_summary(result.metrics)
     st.dataframe(summary_df, hide_index=True, use_container_width=True)
 
     # 5. Trade Log Table & CSV Export
     st.markdown("---")
-    st.markdown("#### 📜 Executed Trade Log")
+    st.markdown("####  Executed Trade Log")
     if not result.trade_df.empty:
         st.dataframe(result.trade_df, hide_index=True, use_container_width=True)
         csv = result.trade_df.to_csv(index=False).encode('utf-8')
         st.download_button(
-            label="📥 Download Executed Trade Log (CSV)",
+            label=" Download Executed Trade Log (CSV)",
             data=csv,
             file_name=f"{result.asset_name}_{result.strategy_name}_trades.csv",
             mime="text/csv",

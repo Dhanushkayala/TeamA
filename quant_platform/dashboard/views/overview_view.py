@@ -27,7 +27,7 @@ def render_overview_view(
     risk_free_rate: float = 0.04,
 ):
     render_section_banner(
-        icon="📈",
+        icon="",
         title="Multi-Asset Intelligence & Technical Overview",
         subtitle="Comparative performance, asset health, and moving average overlays normalized on a unified trading calendar.",
         badge_text=f"Universe: {len(aligned_close.columns)} Assets • Risk-Free {risk_free_rate*100:.1f}%",
@@ -57,17 +57,17 @@ def render_overview_view(
             st.markdown(f"""
             <div class="quant-card" style="border-top: 3px solid {color};">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <span style="font-weight:700; font-size:0.92rem; color:#f1f5f9; font-family:'Plus Jakarta Sans',sans-serif;">{asset_name}</span>
+                    <span style="font-weight:700; font-size:0.92rem; color:var(--text-primary); font-family:'Plus Jakarta Sans',sans-serif;">{asset_name}</span>
                     <span style="font-size:0.75rem; color:{badge_fg}; background:{badge_bg}; padding:2px 8px; border-radius:10px; font-weight:700; font-family:'JetBrains Mono',monospace;">{delta_str}</span>
                 </div>
-                <div style="font-size:1.55rem; font-weight:800; color:#ffffff; font-family:'JetBrains Mono',monospace; letter-spacing:-0.03em;">
+                <div style="font-size:1.55rem; font-weight:800; color:var(--text-primary); font-family:'JetBrains Mono',monospace; letter-spacing:-0.03em;">
                     ${latest_price:,.2f}
                 </div>
-                <div style="display:flex; justify-content:space-between; margin-top:10px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.05); font-size:0.78rem; color:#94a3b8; font-family:'JetBrains Mono',monospace;">
-                    <span>Sharpe <strong style="color:#f1f5f9;">{sharpe:.2f}</strong></span>
-                    <span>Sortino <strong style="color:#f1f5f9;">{sortino:.2f}</strong></span>
+                <div style="display:flex; justify-content:space-between; margin-top:10px; padding-top:8px; border-top:1px solid var(--border-subtle); font-size:0.78rem; color:var(--text-secondary); font-family:'JetBrains Mono',monospace;">
+                    <span>Sharpe <strong style="color:var(--text-primary);">{sharpe:.2f}</strong></span>
+                    <span>Sortino <strong style="color:var(--text-primary);">{sortino:.2f}</strong></span>
                 </div>
-                <div style="display:flex; justify-content:space-between; margin-top:4px; font-size:0.75rem; color:#64748b; font-family:'JetBrains Mono',monospace;">
+                <div style="display:flex; justify-content:space-between; margin-top:4px; font-size:0.75rem; color:var(--text-muted); font-family:'JetBrains Mono',monospace;">
                     <span>Vol: {ann_vol:.1f}%</span>
                     <span>MaxDD: {mdd:.1f}%</span>
                 </div>
@@ -110,7 +110,7 @@ def render_overview_view(
 
     # 3. Individual Asset Technical Analysis with Moving Averages & Bands
     st.markdown("---")
-    st.markdown("#### 🔬 Detailed Asset Chart & Technical Overlays")
+    st.markdown("####  Detailed Asset Chart & Technical Overlays")
     
     col_sel1, col_sel2 = st.columns([1, 2])
     with col_sel1:
@@ -188,7 +188,7 @@ def render_overview_view(
     st.plotly_chart(fig_tech, use_container_width=True)
 
     # Missing Bar / Data Health Summary
-    with st.expander("ℹ️ Data Alignment & Feed Diagnostics"):
+    with st.expander(" Data Alignment & Feed Diagnostics"):
         diag_cols = st.columns(len(aligned_dfs))
         for i, (name, count) in enumerate(fill_stats.items()):
             with diag_cols[i]:

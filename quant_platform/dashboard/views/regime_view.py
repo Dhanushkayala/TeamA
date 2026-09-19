@@ -41,10 +41,10 @@ def render_regime_view(
     cards_col = st.columns(4)
     
     badge_styles = {
-        "Bull / Low Volatility": ("🟢 Bull / Low Vol", "#10b981", "positive"),
-        "Bull / High Volatility": ("🟡 Bull / High Vol", "#f59e0b", "warning"),
-        "Bear / Low Volatility": ("🟠 Bear / Low Vol", "#eb6834", "default"),
-        "Bear / High Volatility": ("🔴 Bear / High Vol", "#ef4444", "negative"),
+        "Bull / Low Volatility": (" Bull / Low Vol", "#10b981", "positive"),
+        "Bull / High Volatility": (" Bull / High Vol", "#f59e0b", "warning"),
+        "Bear / Low Volatility": (" Bear / Low Vol", "#eb6834", "default"),
+        "Bear / High Volatility": (" Bear / High Vol", "#ef4444", "negative"),
     }
 
     for idx, row in regime_perf_df.iterrows():
@@ -60,7 +60,7 @@ def render_regime_view(
     st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
 
     # 3. Price Chart with Regime Shading Bands
-    st.markdown("#### 🎨 Asset Price Path Conditioned on Market Regimes")
+    st.markdown("####  Asset Price Path Conditioned on Market Regimes")
     st.caption("Historical price candles color-coded by macro regime state to observe structural regime shifts.")
 
     fig_reg = go.Figure()
@@ -106,7 +106,7 @@ def render_regime_view(
 
     # 4. Regime Conditioned Performance Metrics Table & Bar Charts
     st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
-    st.markdown("#### 📊 Strategy Performance Breakdown by Regime")
+    st.markdown("####  Strategy Performance Breakdown by Regime")
     st.dataframe(regime_perf_df, hide_index=True, use_container_width=True)
 
     # Bar Charts

@@ -1,78 +1,24 @@
 """
-QuantLab Authentication Module.
+BetaScope Authentication Module.
 
-Provides secure, native Streamlit authentication:
-  - Login / Register / Logout flows
-  - Bcrypt password verification and hashing
-  - Credential persistence via users_db.yaml
-  - Quick 1-click Demo Account access
+Provides Google OAuth2 authentication:
+  - Sign in / Sign up via Google
+  - Admin role check
 """
 
 import os
-from pathlib import Path
-import yaml
-import bcrypt
+import requests
 import streamlit as st
+import urllib.parse
+from dotenv import load_dotenv
 
+# Load environment variables
+load_dotenv()
 
-# Path to credentials file (project root)
-_YAML_PATH = Path(__file__).parents[2] / "users_db.yaml"
-
-
-def _load_config() -> dict:
-    """Load credentials config from YAML file, with fallback defaults."""
-    if _YAML_PATH.exists():
-        try:
-            with open(_YAML_PATH, "r", encoding="utf-8") as f:
-                data = yaml.safe_load(f)
-                if data and "credentials" in data:
-                    return data
-        except Exception:
-            pass
-
-    # Fallback default configuration
-    default_config = {
-        "credentials": {
-            "usernames": {
-                "demo": {
-                    "name": "Demo User",
-                    "email": "demo@quantlab.io",
-                    "password": bcrypt.hashpw(b"demo123", bcrypt.gensalt(12)).decode("utf-8"),
-                    "role": "user",
-                },
-                "admin": {
-                    "name": "QuantLab Admin",
-                    "email": "admin@quantlab.io",
-                    "password": bcrypt.hashpw(b"admin2024", bcrypt.gensalt(12)).decode("utf-8"),
-                    "role": "admin",
-                },
-            }
-        }
-    }
-    _save_config(default_config)
-    return default_config
-
-
-def _save_config(config: dict) -> None:
-    """Persist credentials back to YAML."""
-    try:
-        with open(_YAML_PATH, "w", encoding="utf-8") as f:
-            yaml.dump(config, f, default_flow_style=False, allow_unicode=True)
-    except Exception:
-        pass
-
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verify a plaintext password against a bcrypt hash."""
-    try:
-        return bcrypt.checkpw(plain_password.encode("utf-8"), hashed_password.encode("utf-8"))
-    except Exception:
-        return False
-
-
-def hash_password(plain_password: str) -> str:
-    """Hash a plaintext password using bcrypt."""
-    return bcrypt.hashpw(plain_password.encode("utf-8"), bcrypt.gensalt(12)).decode("utf-8")
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
+GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "")
+GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:8501")
+ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "admin@example.com")
 
 
 def get_auth_state() -> tuple[bool, str, str]:
@@ -88,19 +34,66 @@ def get_auth_state() -> tuple[bool, str, str]:
     return is_auth, name, username
 
 
+def get_user_role() -> str:
+    """
+    Get the current user's role.
+    """
+    return st.session_state.get("role", "user")
+
+
 def render_auth_page() -> tuple[bool, str, str]:
     """
-    Render the login and registration page.
+    Render the Google OAuth login page.
 
     Returns:
         (is_authenticated, display_name, username)
     """
-    config = _load_config()
-    users = config.get("credentials", {}).get("usernames", {})
-
-    # Check if already authenticated
     if st.session_state.get("authentication_status", False):
         return True, st.session_state.get("name", "User"), st.session_state.get("username", "user")
+
+    # Check for OAuth callback
+    if "code" in st.query_params:
+        code = st.query_params["code"]
+        try:
+            # Exchange code for token
+            token_url = "https://oauth2.googleapis.com/token"
+            token_data = {
+                "code": code,
+                "client_id": GOOGLE_CLIENT_ID,
+                "client_secret": GOOGLE_CLIENT_SECRET,
+                "redirect_uri": GOOGLE_REDIRECT_URI,
+                "grant_type": "authorization_code"
+            }
+            token_r = requests.post(token_url, data=token_data)
+            token_r.raise_for_status()
+            access_token = token_r.json().get("access_token")
+
+            # Get user info
+            userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
+            userinfo_r = requests.get(userinfo_url, headers={"Authorization": f"Bearer {access_token}"})
+            userinfo_r.raise_for_status()
+            user_data = userinfo_r.json()
+
+            # Set session state
+            st.session_state["authentication_status"] = True
+            st.session_state["name"] = user_data.get("name", "User")
+            email = user_data.get("email", "")
+            st.session_state["username"] = email
+            
+            # Check Admin role
+            is_admin = (email and email.lower() == ADMIN_EMAIL.lower())
+            st.session_state["role"] = "admin" if is_admin else "user"
+            
+            if is_admin:
+                st.session_state["ql_active_page"] = "admin"
+            
+            # Clear query params
+            st.query_params.clear()
+            st.rerun()
+
+        except Exception as e:
+            st.error("Authentication failed. Please check your Google OAuth credentials or try again.")
+            st.query_params.clear()
 
     # ── Centered Auth Box Layout ─────────────────────────────────────────────
     col_l, col_c, col_r = st.columns([1, 1.8, 1])
@@ -109,9 +102,9 @@ def render_auth_page() -> tuple[bool, str, str]:
         st.markdown("""
         <div class="auth-page-header">
             <div class="auth-logo">
-                <div class="auth-logo-icon">Q</div>
+                <div class="auth-logo-icon">&beta;</div>
                 <div>
-                    <div class="auth-logo-title">QuantLab</div>
+                    <div class="auth-logo-title">BetaScope</div>
                     <div class="auth-logo-sub">Quantitative Multi-Asset Intelligence</div>
                 </div>
             </div>
@@ -122,101 +115,46 @@ def render_auth_page() -> tuple[bool, str, str]:
         </div>
         """, unsafe_allow_html=True)
 
-        # Quick 1-Click Demo Login
-        col_demo1, col_demo2 = st.columns([1, 1])
-        with col_demo1:
-            if st.button("🚀 Quick Login (Demo)", key="btn_quick_demo", use_container_width=True, type="primary"):
-                st.session_state["authentication_status"] = True
-                st.session_state["username"] = "demo"
-                st.session_state["name"] = users.get("demo", {}).get("name", "Demo User")
-                st.rerun()
+        if not GOOGLE_CLIENT_ID or not GOOGLE_CLIENT_SECRET:
+            st.warning("Google OAuth credentials are not configured. Please set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in your .env file.")
 
-        with col_demo2:
-            if st.button("👑 Quick Login (Admin)", key="btn_quick_admin", use_container_width=True):
-                st.session_state["authentication_status"] = True
-                st.session_state["username"] = "admin"
-                st.session_state["name"] = users.get("admin", {}).get("name", "QuantLab Admin")
-                st.rerun()
+        # Generate Auth URL
+        auth_url = "https://accounts.google.com/o/oauth2/v2/auth"
+        params = {
+            "client_id": GOOGLE_CLIENT_ID,
+            "response_type": "code",
+            "redirect_uri": GOOGLE_REDIRECT_URI,
+            "scope": "openid email profile",
+            "access_type": "offline",
+            "prompt": "select_account"
+        }
+        login_url = f"{auth_url}?{urllib.parse.urlencode(params)}"
 
-        st.markdown("<div style='margin: 12px 0 16px 0; text-align: center; color: #484f58; font-size: 0.8rem;'>─── OR SIGN IN WITH CREDENTIALS ───</div>", unsafe_allow_html=True)
-
-        login_tab, register_tab = st.tabs(["🔐 Sign In", "✨ Create Account"])
-
-        with login_tab:
-            with st.form("login_form", clear_on_submit=False):
-                username_input = st.text_input("Username", placeholder="e.g. demo", key="form_user")
-                password_input = st.text_input("Password", type="password", placeholder="e.g. demo123", key="form_pass")
-                submit_login = st.form_submit_button("Sign In →", use_container_width=True)
-
-            if submit_login:
-                u_clean = username_input.strip()
-                if not u_clean or not password_input:
-                    st.error("Please enter both username and password.")
-                elif u_clean not in users:
-                    st.error("❌ Username not found.")
-                else:
-                    stored_hash = users[u_clean].get("password", "")
-                    if verify_password(password_input, stored_hash):
-                        st.session_state["authentication_status"] = True
-                        st.session_state["username"] = u_clean
-                        st.session_state["name"] = users[u_clean].get("name", u_clean)
-                        st.success(f"Welcome back, {st.session_state['name']}!")
-                        st.rerun()
-                    else:
-                        st.error("❌ Incorrect password.")
-
-            st.markdown(
-                "<p style='color:#7d8590; font-size:0.82rem; margin-top:12px;'>"
-                "<strong style='color:#adbac7;'>Demo account:</strong> "
-                "username <code>demo</code> · password <code>demo123</code>"
-                "</p>",
-                unsafe_allow_html=True,
-            )
-
-        with register_tab:
-            with st.form("register_form", clear_on_submit=True):
-                reg_name = st.text_input("Full Name", placeholder="e.g. John Doe", key="reg_name")
-                reg_user = st.text_input("Username", placeholder="e.g. jdoe", key="reg_user")
-                reg_email = st.text_input("Email", placeholder="e.g. john@example.com", key="reg_email")
-                reg_pass = st.text_input("Password", type="password", placeholder="Minimum 6 characters", key="reg_pass")
-                reg_pass2 = st.text_input("Confirm Password", type="password", key="reg_pass2")
-                submit_reg = st.form_submit_button("Create Account ✨", use_container_width=True)
-
-            if submit_reg:
-                u_clean = reg_user.strip().lower()
-                if not reg_name.strip() or not u_clean or not reg_email.strip() or not reg_pass:
-                    st.error("All fields are required.")
-                elif len(reg_pass) < 6:
-                    st.error("Password must be at least 6 characters long.")
-                elif reg_pass != reg_pass2:
-                    st.error("Passwords do not match.")
-                elif u_clean in users:
-                    st.error(f"Username '{u_clean}' already exists. Please choose another.")
-                else:
-                    users[u_clean] = {
-                        "name": reg_name.strip(),
-                        "email": reg_email.strip(),
-                        "password": hash_password(reg_pass),
-                        "role": "user",
-                    }
-                    config["credentials"]["usernames"] = users
-                    _save_config(config)
-
-                    st.session_state["authentication_status"] = True
-                    st.session_state["username"] = u_clean
-                    st.session_state["name"] = reg_name.strip()
-                    st.success("🎉 Account created successfully! Logging you in...")
-                    st.rerun()
+        # Custom Google Login Button
+        st.markdown(
+            f"""
+            <div style="display: flex; justify-content: center; margin-top: 30px; margin-bottom: 30px;">
+                <a href="{login_url}" target="_self" style="text-decoration: none;">
+                    <div style="background-color: var(--card-bg); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 12px 24px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google Logo" style="width: 24px; height: 24px;">
+                        <span style="color: var(--text-primary); font-weight: 600; font-family: 'Inter', sans-serif;">Sign in with Google</span>
+                    </div>
+                </a>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
     return False, "", ""
 
 
 def render_logout_button(button_key: str = "logout_btn") -> None:
     """Render a clean Sign Out button."""
-    if st.button("🚪 Sign Out", key=button_key, use_container_width=True):
+    if st.button("Sign Out", key=button_key, use_container_width=True):
         st.session_state["authentication_status"] = False
         st.session_state["username"] = ""
         st.session_state["name"] = ""
+        st.session_state["role"] = "user"
         for key in list(st.session_state.keys()):
             if key.startswith("saved_"):
                 del st.session_state[key]

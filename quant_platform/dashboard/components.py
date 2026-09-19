@@ -177,7 +177,7 @@ def render_section_banner(
     subtitle: str = "",
     badge_text: str = "",
     badge_color: str = "#3b82f6",
-    icon: str = "⚡",
+    icon: str = "",
 ) -> None:
     """Render an impressive section hero banner."""
     badge_html = f"<span style='font-size:0.75rem; font-weight:600; color:{badge_color}; background:rgba(255,255,255,0.06); padding:4px 10px; border-radius:12px; border:1px solid rgba(255,255,255,0.1);'>{badge_text}</span>" if badge_text else ""
@@ -198,7 +198,7 @@ def render_section_banner(
     """, unsafe_allow_html=True)
 
 
-def render_section_header(title: str, subtitle: str = "", icon: str = "📊") -> None:
+def render_section_header(title: str, subtitle: str = "", icon: str = "") -> None:
     """Backward-compatible section header wrapper."""
     render_section_banner(title=title, subtitle=subtitle, icon=icon)
 
@@ -207,7 +207,7 @@ def render_disclaimer_footer() -> None:
     """Persistent disclaimer footer across all dashboard views."""
     st.markdown("""
     <div class="quant-disclaimer">
-        ⚠️ <strong>Research &amp; Educational System</strong> — QuantLab provides historical simulation, risk modeling, and algorithmic intelligence. Simulated execution assumes zero liquidity constraints beyond modeled slippage. Past results do not guarantee future performance.
+        ⚠️ <strong>Research &amp; Educational System</strong> — BetaScope provides historical simulation, risk modeling, and algorithmic intelligence. Simulated execution assumes zero liquidity constraints beyond modeled slippage. Past results do not guarantee future performance.
     </div>
     """, unsafe_allow_html=True)
 
@@ -224,6 +224,12 @@ NAV_PAGES: list[tuple[str, str]] = [
     ("profile",   "Profile"),
 ]
 
+def get_nav_pages(role: str = "user") -> list[tuple[str, str]]:
+    pages = NAV_PAGES.copy()
+    if role == "admin":
+        pages.append(("admin", "Admin"))
+    return pages
+
 _NAV_STATE_KEY = "ql_active_page"
 
 
@@ -232,65 +238,91 @@ def get_active_page() -> str:
     return st.session_state.get(_NAV_STATE_KEY, "overview")
 
 
-def render_navbar(username: str, display_name: str) -> None:
+def render_navbar(username: str, display_name: str, role: str = "user") -> None:
     """
-    Render the sticky top navigation bar.
-    Injects brand, live sync tag, nav page buttons, user pill, and theme mode toggle.
+    Render the unified sticky top navigation bar.
+    Integrates Brand/Logo, Live sync badge, segmented page navigation,
+    Light/Dark Mode toggle switch, and user profile pill in a single horizontal layout.
     """
     active = get_active_page()
     theme = get_current_theme()
-    theme_toggle_label = "Light" if theme == "dark" else "Dark"
     initials = "".join(w[0].upper() for w in (display_name or username).split()[:2])
 
-    st.markdown(f"""
-    <div class="ql-navbar">
-        <div class="ql-navbar-brand">
-            <div class="ql-navbar-logo">Q</div>
-            <div>
-                <span class="ql-navbar-name">QuantLab</span>
-            </div>
-            <div class="ql-live-tag">
-                <span class="ql-live-dot"></span> Sync Active
-            </div>
-        </div>
-        <div style="display:flex; align-items:center; gap:10px; margin-left:auto;">
-            <div style="display:flex; align-items:center; gap:8px;
-                        padding:4px 12px; background:var(--bg-elevated);
-                        border:1px solid var(--border); border-radius:20px;">
-                <div style="width:24px; height:24px; border-radius:50%;
-                            background:linear-gradient(135deg,#2563eb,#7c3aed);
-                            display:flex; align-items:center; justify-content:center;
-                            font-size:0.72rem; font-weight:700; color:#fff;
-                            font-family:'Plus Jakarta Sans',sans-serif;">{initials}</div>
-                <span style="font-size:0.80rem; font-weight:600;
-                             color:var(--text-secondary);
-                             font-family:'Inter',sans-serif;">@{username}</span>
-            </div>
-        </div>
-    </div>
+    def on_nav_theme_toggle_change():
+        is_light = st.session_state.get("nav_theme_toggle_switch", False)
+        st.session_state["ql_theme"] = "light" if is_light else "dark"
+
+    # Synchronize toggle state before widget instantiation
+    st.session_state["nav_theme_toggle_switch"] = (theme == "light")
+
+    st.markdown("""
+    <div style="background:var(--bg-glass); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+                border:1px solid var(--border); border-radius:14px; padding:8px 14px; margin-bottom:14px;
+                box-shadow:var(--shadow-card);">
     """, unsafe_allow_html=True)
 
-    page_labels = [label for key, label in NAV_PAGES]
-    default_label = next((label for key, label in NAV_PAGES if key == active), page_labels[0])
-    
-    col1, col2 = st.columns([5, 1], gap="small")
-    
-    with col1:
-        # Use segmented control for a seamless native navbar experience
+    col_brand, col_nav, col_toggle, col_user = st.columns(
+        [2.2, 5.0, 1.4, 1.4],
+        vertical_alignment="center",
+        gap="small"
+    )
+
+    with col_brand:
+        st.markdown(f"""
+        <div class="ql-navbar-brand" style="display:flex; align-items:center; gap:8px;">
+            <div class="ql-navbar-logo" style="width:30px; height:30px; border-radius:8px;
+                        background:linear-gradient(135deg,#2563eb,#7c3aed);
+                        display:flex; align-items:center; justify-content:center;
+                        font-weight:800; font-size:1.05rem; color:#fff;
+                        box-shadow:0 2px 8px rgba(37,99,235,0.4);">&beta;</div>
+            <div>
+                <span class="ql-navbar-name" style="font-size:1.05rem; font-weight:700; color:var(--text-primary);
+                             font-family:'Plus Jakarta Sans',sans-serif; letter-spacing:-0.02em;">BetaScope</span>
+            </div>
+            <div class="ql-live-tag" style="margin-left:2px; font-size:0.68rem; padding:2px 7px;">
+                <span class="ql-live-dot"></span> Active
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col_nav:
+        nav_pages_list = get_nav_pages(role)
+        page_labels = [label for key, label in nav_pages_list]
+        default_label = next((label for key, label in nav_pages_list if key == active), page_labels[0])
         selected_label = st.segmented_control(
-            "Navigation", 
+            "Navigation",
             options=page_labels,
             default=default_label,
-            label_visibility="collapsed"
+            label_visibility="collapsed",
+            key="nav_bar_segmented_control",
         )
         if selected_label and selected_label != default_label:
-            selected_key = next(key for key, label in NAV_PAGES if label == selected_label)
+            selected_key = next(key for key, label in nav_pages_list if label == selected_label)
             st.session_state[_NAV_STATE_KEY] = selected_key
             st.rerun()
 
-    with col2:
-        # Theme toggle right next to the navigation
-        if st.button(theme_toggle_label, key="nav_theme_toggle_btn", use_container_width=True):
-            new_theme = "light" if theme == "dark" else "dark"
-            st.session_state["ql_theme"] = new_theme
-            st.rerun()
+    with col_toggle:
+        st.toggle(
+            "Light" if theme == "light" else "Dark",
+            key="nav_theme_toggle_switch",
+            on_change=on_nav_theme_toggle_change,
+        )
+
+    with col_user:
+        st.markdown(f"""
+        <div style="display:flex; align-items:center; justify-content:flex-end; gap:8px;">
+            <div style="width:28px; height:28px; border-radius:50%;
+                        background:linear-gradient(135deg,#2563eb,#7c3aed);
+                        display:flex; align-items:center; justify-content:center;
+                        font-size:0.75rem; font-weight:700; color:#fff;
+                        font-family:'Plus Jakarta Sans',sans-serif;
+                        box-shadow:0 2px 6px rgba(37,99,235,0.3);">{initials}</div>
+            <span style="font-size:0.80rem; font-weight:600;
+                         color:var(--text-secondary);
+                         font-family:'Inter',sans-serif;
+                         max-width:90px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">@{username}</span>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
