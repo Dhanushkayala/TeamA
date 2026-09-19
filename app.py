@@ -8,10 +8,9 @@ import datetime
 import pandas as pd
 import numpy as np
 
-# ── Page config MUST be first Streamlit call ─────────────────────────────────
 st.set_page_config(
     page_title="QuantLab | Quantitative Multi-Asset Intelligence",
-    page_icon="📈",
+    page_icon="Q",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -133,18 +132,18 @@ with st.sidebar:
 
     # Theme Switcher in Sidebar
     def on_sidebar_theme_change():
-        chosen = st.session_state.get("sidebar_theme_radio", "🌙 Dark Mode")
+        chosen = st.session_state.get("sidebar_theme_radio", "Dark Mode")
         st.session_state["ql_theme"] = "light" if "Light" in chosen else "dark"
 
     # Always mirror ql_theme into the radio key BEFORE the widget is created.
     # This is the only safe place to write to a widget's session-state key.
     st.session_state["sidebar_theme_radio"] = (
-        "☀️ Light Mode" if st.session_state.get("ql_theme", "dark") == "light" else "🌙 Dark Mode"
+        "Light Mode" if st.session_state.get("ql_theme", "dark") == "light" else "Dark Mode"
     )
 
     st.radio(
         "Theme Mode",
-        ["🌙 Dark Mode", "☀️ Light Mode"],
+        ["Dark Mode", "Light Mode"],
         key="sidebar_theme_radio",
         horizontal=True,
         on_change=on_sidebar_theme_change,
@@ -438,7 +437,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 floating_clicked = st.button(
-    "💬",
+    "AI",
     key="floating_corner_ai_btn",
     help="Chat with QuantBot AI Quantitative Analyst",
 )

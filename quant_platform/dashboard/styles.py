@@ -723,7 +723,7 @@ def apply_custom_css(theme: str = None) -> None:
         z-index: 9998;
         pointer-events: none;
     }}
-    div[data-testid="stButton"] button:has(div:contains("💬")),
+    div[data-testid="stButton"] button:has(div:contains("AI")),
     button[key="floating_corner_ai_btn"] {{
         position: fixed !important;
         bottom: 24px !important;
@@ -743,7 +743,7 @@ def apply_custom_css(theme: str = None) -> None:
         padding: 0 !important;
         transition: transform var(--transition-fast), box-shadow var(--transition-fast) !important;
     }}
-    div[data-testid="stButton"] button:has(div:contains("💬")):hover,
+    div[data-testid="stButton"] button:has(div:contains("AI")):hover,
     button[key="floating_corner_ai_btn"]:hover {{
         transform: scale(1.08) !important;
         box-shadow: 0 8px 30px rgba(6, 182, 212, 0.55) !important;

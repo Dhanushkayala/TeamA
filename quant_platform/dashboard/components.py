@@ -215,13 +215,13 @@ def render_disclaimer_footer() -> None:
 # ─── Navigation Bar ──────────────────────────────────────────────────────────
 
 NAV_PAGES: list[tuple[str, str]] = [
-    ("overview",  "🏠 Overview"),
-    ("risk",      "⚡ Risk"),
-    ("corr",      "🔗 Correlation"),
-    ("backtest",  "⚙️ Backtest"),
-    ("robust",    "🛡️ Robustness"),
-    ("regimes",   "🌐 Regimes"),
-    ("profile",   "👤 Profile"),
+    ("overview",  "Overview"),
+    ("risk",      "Risk"),
+    ("corr",      "Correlation"),
+    ("backtest",  "Backtest"),
+    ("robust",    "Robustness"),
+    ("regimes",   "Regimes"),
+    ("profile",   "Profile"),
 ]
 
 _NAV_STATE_KEY = "ql_active_page"
@@ -239,7 +239,7 @@ def render_navbar(username: str, display_name: str) -> None:
     """
     active = get_active_page()
     theme = get_current_theme()
-    theme_toggle_label = "☀️ Light" if theme == "dark" else "🌙 Dark"
+    theme_toggle_label = "Light" if theme == "dark" else "Dark"
     initials = "".join(w[0].upper() for w in (display_name or username).split()[:2])
 
     st.markdown(f"""
@@ -270,18 +270,27 @@ def render_navbar(username: str, display_name: str) -> None:
     </div>
     """, unsafe_allow_html=True)
 
-    cols = st.columns([1, 1, 1.1, 1.1, 1.1, 1.1, 1, 1], gap="small")
-    for col, (page_key, label) in zip(cols[:len(NAV_PAGES)], NAV_PAGES):
-        with col:
-            btn_type = "primary" if active == page_key else "secondary"
-            if st.button(label, key=f"nav_{page_key}", use_container_width=True, type=btn_type):
-                st.session_state[_NAV_STATE_KEY] = page_key
-                st.rerun()
+    page_labels = [label for key, label in NAV_PAGES]
+    default_label = next((label for key, label in NAV_PAGES if key == active), page_labels[0])
+    
+    col1, col2 = st.columns([5, 1], gap="small")
+    
+    with col1:
+        # Use segmented control for a seamless native navbar experience
+        selected_label = st.segmented_control(
+            "Navigation", 
+            options=page_labels,
+            default=default_label,
+            label_visibility="collapsed"
+        )
+        if selected_label and selected_label != default_label:
+            selected_key = next(key for key, label in NAV_PAGES if label == selected_label)
+            st.session_state[_NAV_STATE_KEY] = selected_key
+            st.rerun()
 
-    with cols[-1]:
-        if st.button(theme_toggle_label, key="nav_theme_toggle_btn", use_container_width=True, help="Toggle Light / Dark Mode"):
+    with col2:
+        # Theme toggle right next to the navigation
+        if st.button(theme_toggle_label, key="nav_theme_toggle_btn", use_container_width=True):
             new_theme = "light" if theme == "dark" else "dark"
             st.session_state["ql_theme"] = new_theme
-            # Sync the sidebar radio BEFORE it's instantiated (pre-init guard in app.py handles this on rerun)
-            # Do NOT write to sidebar_theme_radio here — Streamlit owns that key once the widget is rendered
             st.rerun()
