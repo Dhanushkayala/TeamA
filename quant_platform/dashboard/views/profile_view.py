@@ -1,19 +1,22 @@
 """
 User Profile View — My Profile tab.
 
-Shows: user stats, achievements (earned & locked), and session history.
+Shows: user stats, strategy distribution donut, Sharpe progression, achievements, and session history.
 """
 
 import streamlit as st
 import pandas as pd
+import plotly.graph_objects as go
+
 from quant_platform.auth.user_store import ACHIEVEMENTS, load_profile, get_recent_sessions
+from quant_platform.dashboard.components import apply_plotly_theme
 
 
 def render_profile_view(username: str, display_name: str) -> None:
     """Render the full My Profile page for the currently logged-in user."""
 
     profile = load_profile(username, display_name)
-    sessions = get_recent_sessions(username, n=10)
+    sessions = get_recent_sessions(username, n=15)
     initials = "".join(w[0].upper() for w in (display_name or username).split()[:2])
 
     # ── Profile Header ────────────────────────────────────────────────────────
@@ -37,7 +40,7 @@ def render_profile_view(username: str, display_name: str) -> None:
 
     col_left, col_right = st.columns([1, 1], gap="large")
 
-    # ── Left Column: Stats ────────────────────────────────────────────────────
+    # ── Left Column: Stats & Charts ───────────────────────────────────────────
     with col_left:
         st.markdown("""
         <div class="section-header">
@@ -63,19 +66,21 @@ def render_profile_view(username: str, display_name: str) -> None:
             </div>
             """, unsafe_allow_html=True)
 
-        # Best session stats if available
-        if sessions:
-            best = max(sessions, key=lambda x: x.get("sharpe", 0))
-            st.markdown(f"""
-            <div class="quant-card" style="--card-accent: var(--accent-warm);">
-                <div class="quant-card-title">🎯 Best Backtest (Sharpe)</div>
-                <div class="quant-card-value">{best.get("sharpe", 0):.2f}</div>
-                <div class="quant-card-sub">
-                    {best.get("asset", "—")} · {best.get("strategy", "—")} ·
-                    Return {best.get("total_return_pct", 0):+.1f}%
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+        # Strategy Model Allocation Donut
+        strat_dict = profile.get("strategies_run", {})
+        if strat_dict and sum(strat_dict.values()) > 0:
+            st.markdown("##### 🧭 Strategy Usage Breakdown")
+            fig_strat_donut = go.Figure(data=[go.Pie(
+                labels=list(strat_dict.keys()),
+                values=list(strat_dict.values()),
+                hole=0.55,
+                marker=dict(colors=["#3b82f6", "#10b981", "#f59e0b", "#8b5cf6"], line=dict(color="#0d1117", width=2)),
+                textinfo="label+percent",
+                hovertemplate="<b>%{label}</b><br>Runs: %{value}<br>Share: %{percent}<extra></extra>",
+            )])
+            apply_plotly_theme(fig_strat_donut, height=260)
+            fig_strat_donut.update_layout(showlegend=False)
+            st.plotly_chart(fig_strat_donut, use_container_width=True)
 
     # ── Right Column: Achievements ────────────────────────────────────────────
     with col_right:
@@ -101,7 +106,7 @@ def render_profile_view(username: str, display_name: str) -> None:
                     <div class="achievement-info">
                         <h5>{ach["title"]}</h5>
                         <p>{ach["description"]}</p>
-                        <span class="rarity-{ach['rarity']}">{ach["rarity"]}</span>
+                        <span class="rarity-{ach['rarity']}">{ach['rarity']}</span>
                     </div>
                 </div>
                 <div style="height:6px;"></div>
@@ -121,24 +126,45 @@ def render_profile_view(username: str, display_name: str) -> None:
                         <div class="achievement-info">
                             <h5>{ach["title"]}</h5>
                             <p>{ach["description"]}</p>
-                            <span class="rarity-{ach['rarity']}">{ach["rarity"]}</span>
+                            <span class="rarity-{ach['rarity']}">{ach['rarity']}</span>
                         </div>
                     </div>
                     <div style="height:6px;"></div>
                     """, unsafe_allow_html=True)
 
-    # ── Session History ───────────────────────────────────────────────────────
+    # ── Session History with Sharpe Progression Bar Chart ────────────────────
+    st.markdown("---")
     st.markdown("""
     <div class="section-header">
         <div class="section-header-icon">🕐</div>
         <div class="section-header-text">
-            <h4>Recent Session History</h4>
-            <p>Your last 10 backtest sessions</p>
+            <h4>Recent Session History & Performance Progression</h4>
+            <p>Your historical backtest records and Sharpe ratio progression</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
     if sessions:
+        # Sharpe Progression Bar Chart
+        session_dates = [s.get("date", "")[:10] for s in sessions][::-1]
+        session_sharpes = [s.get("sharpe", 0.0) for s in sessions][::-1]
+        session_assets = [f"{s.get('asset', '')} ({s.get('strategy', '')})" for s in sessions][::-1]
+        session_colors = ["#10b981" if sh >= 1.0 else ("#f59e0b" if sh >= 0 else "#ef4444") for sh in session_sharpes]
+
+        fig_prog = go.Figure()
+        fig_prog.add_trace(go.Bar(
+            x=[f"#{i+1} {session_assets[i]}" for i in range(len(session_sharpes))],
+            y=session_sharpes,
+            marker_color=session_colors,
+            text=[f"{sh:.2f}" for sh in session_sharpes],
+            textposition="auto",
+            hovertemplate="<b>%{x}</b><br>Sharpe: %{y:.2f}<extra></extra>",
+        ))
+        fig_prog.add_hline(y=1.0, line_dash="dash", line_color="#10b981", annotation_text="Benchmark Sharpe (1.0)")
+        apply_plotly_theme(fig_prog, title="Historical Backtest Sharpe Ratio Progression", height=280)
+        fig_prog.update_layout(yaxis_title="Sharpe Ratio")
+        st.plotly_chart(fig_prog, use_container_width=True)
+
         rows_html = ""
         for s in sessions:
             date_str = s.get("date", "")[:16].replace("T", " ")

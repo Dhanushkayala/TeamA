@@ -1,4 +1,4 @@
-"""Tab 6: Market Regime Analysis - Regime Conditioning and Macro Behavior."""
+"""Tab 6: Market Regime Analysis - Regime Conditioning, Donut Allocation, and Radar Performance."""
 
 import streamlit as st
 import pandas as pd
@@ -18,7 +18,7 @@ def render_regime_view(
     risk_free_rate: float = 0.04,
 ):
     st.markdown(f"### 🌐 Market Regime Intelligence: {asset_name}")
-    st.markdown("Classifies market conditions using 200-day Trend and historical expanding ATR Volatility without look-ahead bias.")
+    st.markdown("Classifies market conditions into 4 macro regimes using a 200-day Trend filter and historical expanding ATR Volatility without look-ahead bias.")
 
     # 1. Regime Classifier Execution
     classified_df = RegimeClassifier.classify(
@@ -57,8 +57,9 @@ def render_regime_view(
             </div>
             """, unsafe_allow_html=True)
 
+    st.markdown("<div style='margin-top: 14px;'></div>", unsafe_allow_html=True)
+
     # 3. Price Chart with Regime Shading Bands
-    st.markdown("---")
     st.markdown("#### 🎨 Asset Price Path Conditioned on Market Regimes")
 
     fig_reg = go.Figure()
@@ -78,8 +79,7 @@ def render_regime_view(
             line=dict(color="#94a3b8", width=1.5, dash="dash"),
         ))
 
-    # Add background shaded regime spans
-    # Group contiguous regimes to avoid creating hundreds of tiny shapes
+    # Add background shaded regime spans (grouped by contiguous segments)
     regime_series = classified_df["regime"]
     change_points = (regime_series != regime_series.shift(1))
     groups = change_points.cumsum()
@@ -98,16 +98,81 @@ def render_regime_view(
             line_width=0,
         )
 
-    apply_plotly_theme(fig_reg, title=f"{asset_name} Historical Regimes (Green: Bull/Low-Vol, Yellow: Bull/High-Vol, Orange: Bear/Low-Vol, Red: Bear/High-Vol)", height=400)
+    apply_plotly_theme(fig_reg, title=f"{asset_name} Historical Macro Regimes (Green: Bull/Low-Vol, Yellow: Bull/High-Vol, Orange: Bear/Low-Vol, Red: Bear/High-Vol)", height=380)
     fig_reg.update_layout(yaxis_title="Price ($)")
-    st.plotly_chart(fig_reg)
+    st.plotly_chart(fig_reg, use_container_width=True)
 
-    # 4. Regime Conditioned Performance Metrics Table & Bar Charts
+    # 4. Side-by-Side: Regime Allocation Donut & Radar Performance Chart
     st.markdown("---")
-    st.markdown("#### 📊 Strategy Performance Breakdown by Regime")
-    st.dataframe(regime_perf_df, hide_index=True)
+    st.markdown("#### 🍩 Regime Allocation & Multi-Axis Performance Radar")
+    col_reg_donut, col_reg_radar = st.columns([1, 1.2])
 
-    # Bar Charts
+    with col_reg_donut:
+        st.markdown("##### Regime Time Allocation Share")
+        reg_labels = [row["Regime"] for _, row in regime_perf_df.iterrows()]
+        reg_vals = [row["Days"] for _, row in regime_perf_df.iterrows()]
+        reg_colors = [badge_styles.get(r, (r, "#6b7280"))[1] for r in reg_labels]
+
+        fig_reg_donut = go.Figure(data=[go.Pie(
+            labels=reg_labels,
+            values=reg_vals,
+            hole=0.55,
+            marker=dict(colors=reg_colors, line=dict(color="#0d1117", width=2)),
+            textinfo="label+percent",
+            hovertemplate="<b>%{label}</b><br>Days: %{value}<br>Share: %{percent}<extra></extra>",
+        )])
+        apply_plotly_theme(fig_reg_donut, title="Market Regime Time Allocation", height=320)
+        fig_reg_donut.update_layout(showlegend=False)
+        st.plotly_chart(fig_reg_donut, use_container_width=True)
+
+    with col_reg_radar:
+        st.markdown("##### Strategy Risk-Reward Radar by Regime")
+        # Build normalized radar metrics across the 4 regimes
+        radar_metrics = ["Annualized Return (%)", "Sharpe Ratio", "Win Rate (%)", "Annualized Vol (%)"]
+        fig_reg_radar = go.Figure()
+
+        for _, row in regime_perf_df.iterrows():
+            r_name = row["Regime"]
+            color = badge_styles.get(r_name, (r_name, "#6b7280"))[1]
+            # Normalize metrics for visual radar comparison
+            r_vals = [
+                max(float(row.get("Annualized Return (%)", 0.0)), -50.0),
+                float(row.get("Sharpe Ratio", 0.0)) * 25.0,  # Scaled for radar
+                float(row.get("Win Rate (%)", 0.0)),
+                float(row.get("Annualized Vol (%)", 0.0)),
+            ]
+            r_loop = r_vals + [r_vals[0]]
+            m_loop = radar_metrics + [radar_metrics[0]]
+
+            fig_reg_radar.add_trace(go.Scatterpolar(
+                r=r_loop,
+                theta=m_loop,
+                fill='toself',
+                name=r_name,
+                line=dict(color=color, width=2),
+                opacity=0.5,
+            ))
+
+        fig_reg_radar.update_layout(
+            polar=dict(
+                radialaxis=dict(visible=True, gridcolor="#30363d", linecolor="#30363d", tickfont=dict(size=8, color="#7d8590")),
+                angularaxis=dict(gridcolor="#30363d", linecolor="#30363d", tickfont=dict(size=10, color="#e6edf3")),
+                bgcolor="#161b22",
+            ),
+            paper_bgcolor="#161b22",
+            font=dict(color="#e6edf3", family="Inter, sans-serif"),
+            margin=dict(l=30, r=30, t=30, b=30),
+            height=320,
+            showlegend=True,
+            legend=dict(orientation="h", yanchor="bottom", y=-0.25, xanchor="center", x=0.5),
+        )
+        st.plotly_chart(fig_reg_radar, use_container_width=True)
+
+    # 5. Regime Conditioned Performance Metrics Table & Comparative Bars
+    st.markdown("---")
+    st.markdown("#### 📊 Strategy Performance Scorecard by Regime")
+    st.dataframe(regime_perf_df, hide_index=True, use_container_width=True)
+
     b_col1, b_col2 = st.columns(2)
     with b_col1:
         fig_b1 = px.bar(
@@ -123,9 +188,9 @@ def render_regime_view(
             },
             title="Cumulative Return by Regime (%)",
         )
-        apply_plotly_theme(fig_b1, height=320)
+        apply_plotly_theme(fig_b1, height=280)
         fig_b1.update_layout(showlegend=False)
-        st.plotly_chart(fig_b1)
+        st.plotly_chart(fig_b1, use_container_width=True)
 
     with b_col2:
         fig_b2 = px.bar(
@@ -141,6 +206,6 @@ def render_regime_view(
             },
             title="Sharpe Ratio by Regime",
         )
-        apply_plotly_theme(fig_b2, height=320)
+        apply_plotly_theme(fig_b2, height=280)
         fig_b2.update_layout(showlegend=False)
-        st.plotly_chart(fig_b2)
+        st.plotly_chart(fig_b2, use_container_width=True)
