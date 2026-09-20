@@ -871,76 +871,114 @@ def apply_custom_css(theme: str = None) -> None:
     }}
 
     /* ═══════════════════════════════════════════════════════════════
-       BETASCOPE GRAPHICAL LOADING SCREEN
+       BETASCOPE HIGH-TECH GRAPHICAL LOADING SCREEN
     ═══════════════════════════════════════════════════════════════ */
     .betascope-loader-wrap {{
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 50px 20px;
-        margin: 20px auto 40px auto;
-        max-width: 680px;
-        background: var(--card-grad);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-card);
+        padding: 56px 28px 44px 28px;
+        margin: 24px auto 36px auto;
+        max-width: 720px;
+        background: var(--bg-surface);
+        background: linear-gradient(145deg, rgba(18, 24, 38, 0.92) 0%, rgba(10, 14, 22, 0.96) 100%);
+        border: 1px solid rgba(59, 130, 246, 0.35);
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 35px rgba(37, 99, 235, 0.2);
         text-align: center;
         position: relative;
         overflow: hidden;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
     }}
+
     .betascope-loader-wrap::before {{
         content: '';
         position: absolute;
-        top: 0; left: 0; right: 0; height: 2px;
-        background: linear-gradient(90deg, #2563eb, #06b6d4, #7c3aed, #2563eb);
-        background-size: 200% 100%;
+        top: 0; left: 0; right: 0; height: 3px;
+        background: linear-gradient(90deg, #2563eb, #06b6d4, #a855f7, #ec4899, #2563eb);
+        background-size: 300% 100%;
         animation: gradientShift 3s linear infinite;
+        box-shadow: 0 0 12px rgba(6, 182, 212, 0.8);
     }}
-    @keyframes gradientShift {{
-        0% {{ background-position: 0% 50%; }}
-        100% {{ background-position: 200% 50%; }}
+
+    .loader-ambient-glow {{
+        position: absolute;
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        filter: blur(60px);
+        opacity: 0.25;
+        pointer-events: none;
+        z-index: 0;
+    }}
+    .glow-1 {{
+        top: -40px;
+        left: 20%;
+        background: #2563eb;
+        animation: floatGlow 6s ease-in-out infinite alternate;
+    }}
+    .glow-2 {{
+        bottom: -40px;
+        right: 20%;
+        background: #06b6d4;
+        animation: floatGlow 8s ease-in-out infinite alternate-reverse;
+    }}
+    @keyframes floatGlow {{
+        0% {{ transform: translate(0, 0) scale(1); }}
+        100% {{ transform: translate(25px, 20px) scale(1.2); }}
     }}
 
     .betascope-loader-core {{
         position: relative;
-        width: 130px;
-        height: 130px;
+        width: 144px;
+        height: 144px;
         margin-bottom: 24px;
         display: flex;
         align-items: center;
         justify-content: center;
+        z-index: 1;
     }}
+
     .radar-ring {{
         position: absolute;
         border-radius: 50%;
-        border: 1px dashed rgba(59, 130, 246, 0.4);
     }}
     .radar-ring-outer {{
-        width: 128px;
-        height: 128px;
-        border: 1px solid rgba(59, 130, 246, 0.25);
+        width: 140px;
+        height: 140px;
+        border: 1.5px solid rgba(59, 130, 246, 0.35);
+        box-shadow: 0 0 15px rgba(37, 99, 235, 0.2);
         animation: spinSlow 12s linear infinite;
     }}
     .radar-ring-mid {{
-        width: 96px;
-        height: 96px;
-        border: 1px dashed rgba(6, 182, 212, 0.5);
-        animation: spinReverse 8s linear infinite;
+        width: 104px;
+        height: 104px;
+        border: 1.5px dashed rgba(6, 182, 212, 0.55);
+        animation: spinReverse 7s linear infinite;
     }}
     .radar-ring-inner {{
-        width: 68px;
-        height: 68px;
-        border: 1px solid rgba(124, 58, 237, 0.4);
-        animation: spinSlow 6s linear infinite;
+        width: 74px;
+        height: 74px;
+        border: 1px solid rgba(168, 85, 247, 0.5);
+        animation: spinSlow 4.5s linear infinite;
     }}
+    .radar-ring-dots {{
+        width: 120px;
+        height: 120px;
+        border: 2px dotted rgba(255, 255, 255, 0.2);
+        animation: spinReverse 16s linear infinite;
+    }}
+
     .radar-scanner {{
         position: absolute;
-        width: 128px;
-        height: 128px;
+        width: 140px;
+        height: 140px;
         border-radius: 50%;
-        background: conic-gradient(from 0deg at 50% 50%, rgba(37, 99, 235, 0.4) 0deg, transparent 60deg, transparent 360deg);
-        animation: scanSweep 2s linear infinite;
+        background: conic-gradient(from 0deg at 50% 50%, rgba(6, 182, 212, 0.45) 0deg, rgba(37, 99, 235, 0.15) 45deg, transparent 90deg, transparent 360deg);
+        animation: scanSweep 1.8s linear infinite;
+        z-index: 1;
     }}
     @keyframes scanSweep {{
         0% {{ transform: rotate(0deg); }}
@@ -957,117 +995,159 @@ def apply_custom_css(theme: str = None) -> None:
 
     .betascope-logo-sphere {{
         position: relative;
-        width: 48px;
-        height: 48px;
-        border-radius: 14px;
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
         background: linear-gradient(135deg, #2563eb, #7c3aed);
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: 2;
-        box-shadow: 0 0 20px rgba(37, 99, 235, 0.6);
+        z-index: 3;
+        box-shadow: 0 0 24px rgba(37, 99, 235, 0.75), inset 0 1px 1px rgba(255, 255, 255, 0.4);
     }}
     .betascope-logo-sphere .logo-symbol {{
-        font-size: 1.6rem;
+        font-size: 1.75rem;
         font-weight: 800;
         color: #ffffff;
         font-family: 'Plus Jakarta Sans', sans-serif;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
     }}
     .pulse-aura {{
         position: absolute;
         width: 100%;
         height: 100%;
-        border-radius: 14px;
-        background: rgba(37, 99, 235, 0.5);
-        animation: pulseScale 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        border-radius: 16px;
+        background: rgba(6, 182, 212, 0.5);
+        animation: pulseScale 1.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         z-index: -1;
     }}
+    .pulse-aura-outer {{
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 16px;
+        background: rgba(37, 99, 235, 0.35);
+        animation: pulseScale 1.6s cubic-bezier(0.4, 0, 0.6, 1) infinite 0.4s;
+        z-index: -2;
+    }}
     @keyframes pulseScale {{
-        0%, 100% {{ transform: scale(1); opacity: 0.8; }}
-        50% {{ transform: scale(1.35); opacity: 0; }}
+        0%, 100% {{ transform: scale(1); opacity: 0.85; }}
+        50% {{ transform: scale(1.45); opacity: 0; }}
     }}
 
     .loader-brand-title {{
-        font-size: 1.4rem;
+        font-size: 1.6rem;
         font-weight: 800;
-        color: var(--text-primary);
         font-family: 'Plus Jakarta Sans', sans-serif;
-        letter-spacing: -0.02em;
-        margin-bottom: 2px;
+        letter-spacing: -0.03em;
+        margin-bottom: 4px;
+        z-index: 1;
+    }}
+    .brand-beta {{
+        color: #ffffff;
+    }}
+    .brand-scope {{
+        background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }}
     .loader-brand-subtitle {{
         font-size: 0.72rem;
-        font-weight: 600;
-        letter-spacing: 0.12em;
-        color: var(--accent-cyan);
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        color: #94a3b8;
         text-transform: uppercase;
-        margin-bottom: 20px;
+        margin-bottom: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        z-index: 1;
+    }}
+    .sub-dot {{
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #06b6d4;
+        box-shadow: 0 0 8px #06b6d4;
     }}
 
     .loader-telemetry-bars {{
         display: flex;
         align-items: flex-end;
         justify-content: center;
-        gap: 5px;
-        height: 52px;
+        gap: 6px;
+        height: 56px;
         margin-bottom: 22px;
+        z-index: 1;
     }}
     .t-bar {{
-        width: 4px;
-        background: linear-gradient(180deg, var(--accent-primary), var(--accent-cyan));
-        border-radius: 3px;
-        animation: barBounce 1s ease-in-out infinite alternate;
+        width: 5px;
+        background: linear-gradient(180deg, #38bdf8 0%, #2563eb 60%, #7c3aed 100%);
+        border-radius: 4px;
+        box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+        animation: barBounce 0.9s ease-in-out infinite alternate;
         animation-delay: var(--d);
     }}
     @keyframes barBounce {{
-        0% {{ height: 6px; opacity: 0.3; }}
+        0% {{ height: 5px; opacity: 0.25; }}
         100% {{ height: var(--h); opacity: 1; }}
     }}
 
     .loader-status-tag {{
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        background: rgba(37, 99, 235, 0.08);
-        border: 1px solid rgba(37, 99, 235, 0.25);
-        padding: 5px 14px;
-        border-radius: 20px;
-        margin-bottom: 16px;
+        gap: 9px;
+        background: rgba(37, 99, 235, 0.12);
+        border: 1px solid rgba(56, 189, 248, 0.35);
+        padding: 7px 18px;
+        border-radius: 24px;
+        margin-bottom: 18px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        z-index: 1;
     }}
     .status-indicator-dot {{
-        width: 7px;
-        height: 7px;
+        width: 8px;
+        height: 8px;
         border-radius: 50%;
-        background: var(--accent-success);
-        box-shadow: 0 0 10px var(--accent-success);
-        animation: blinkDot 1s infinite alternate;
+        background: #10b981;
+        box-shadow: 0 0 12px #10b981;
+        animation: blinkDot 0.9s infinite alternate;
     }}
     @keyframes blinkDot {{
-        0% {{ opacity: 0.4; }}
-        100% {{ opacity: 1; }}
+        0% {{ opacity: 0.35; transform: scale(0.85); }}
+        100% {{ opacity: 1; transform: scale(1.15); }}
     }}
     .status-msg {{
-        font-size: 0.78rem;
-        font-weight: 600;
-        color: var(--text-primary);
+        font-size: 0.80rem;
+        font-weight: 700;
+        color: #f1f5f9;
         font-family: 'JetBrains Mono', monospace;
-        letter-spacing: 0.04em;
+        letter-spacing: 0.05em;
     }}
 
     .loader-progress-track {{
-        width: 240px;
-        height: 4px;
-        background: var(--border);
-        border-radius: 2px;
+        position: relative;
+        width: 280px;
+        height: 5px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 4px;
         overflow: hidden;
-        margin-bottom: 18px;
+        margin-bottom: 22px;
+        z-index: 1;
     }}
     .loader-progress-fill {{
         width: 100%;
         height: 100%;
-        background: linear-gradient(90deg, #2563eb, #06b6d4, #7c3aed);
+        background: linear-gradient(90deg, #2563eb, #06b6d4, #a855f7, #38bdf8);
         background-size: 200% 100%;
-        animation: progressMove 1.5s linear infinite;
+        animation: progressMove 1.4s linear infinite;
+        border-radius: 4px;
+    }}
+    .loader-progress-glow {{
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        box-shadow: 0 0 10px rgba(6, 182, 212, 0.6);
     }}
     @keyframes progressMove {{
         0% {{ transform: translateX(-100%); }}
@@ -1076,10 +1156,30 @@ def apply_custom_css(theme: str = None) -> None:
 
     .loader-node-info {{
         display: flex;
-        gap: 16px;
-        font-size: 0.68rem;
-        color: var(--text-muted);
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        font-size: 0.70rem;
         font-family: 'JetBrains Mono', monospace;
+        z-index: 1;
+    }}
+    .telemetry-pill {{
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 3px 9px;
+        color: #94a3b8;
+        font-size: 0.68rem;
+    }}
+    .pill-dot {{
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #38bdf8;
     }}
 
     /* Footer Disclaimer */
