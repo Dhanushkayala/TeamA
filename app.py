@@ -41,6 +41,13 @@ from quant_platform.backtest.strategies import (
     STRATEGY_REGISTRY,
 )
 from quant_platform.backtest.engine import BacktestEngine
+from quant_platform.auth.user_store import save_session, load_profile
+from quant_platform.auth.authenticator import (
+    get_auth_state,
+    get_user_role,
+    render_logout_button,
+    get_google_credentials,
+)
 from quant_platform.dashboard.styles import apply_custom_css
 from quant_platform.dashboard.components import (
     render_disclaimer_footer,
@@ -56,12 +63,23 @@ from quant_platform.dashboard.views import (
     render_robustness_view,
     render_regime_view,
     render_ai_view,
+    render_profile_view,
+    render_admin_view,
 )
 
 
-# 1. Theme State & Design System CSS
+# 1. Theme State & User State
 if "ql_theme" not in st.session_state:
     st.session_state["ql_theme"] = "dark"
+
+if "username" not in st.session_state:
+    st.session_state["username"] = "demo_analyst"
+if "name" not in st.session_state:
+    st.session_state["name"] = "Demo Analyst"
+if "role" not in st.session_state:
+    st.session_state["role"] = "user"
+if "authentication_status" not in st.session_state:
+    st.session_state["authentication_status"] = True
 
 apply_custom_css(theme=st.session_state["ql_theme"])
 
@@ -119,6 +137,25 @@ with st.sidebar:
         key="sidebar_theme_toggle",
         on_change=on_sidebar_theme_toggle,
     )
+
+    current_username = st.session_state.get("username", "demo_analyst")
+    current_display_name = st.session_state.get("name", "Demo Analyst")
+    user_prof = load_profile(current_username, current_display_name)
+    user_initials = "".join(w[0].upper() for w in current_display_name.split()[:2]) or "DA"
+    ach_count = len(user_prof.get("achievements", []))
+    sess_count = user_prof.get("total_sessions", 0)
+
+    st.markdown(f"""
+    <div style="background:var(--card-bg, rgba(255,255,255,0.03)); border:1px solid var(--border-subtle, rgba(255,255,255,0.08)); border-radius:10px; padding:8px 10px; margin-top:8px; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between;">
+        <div style="display:flex; align-items:center; gap:8px;">
+            <div style="width:26px; height:26px; border-radius:50%; background:linear-gradient(135deg,#3b82f6,#10b981); display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:700; color:#fff;">{user_initials}</div>
+            <div>
+                <div style="font-size:0.80rem; font-weight:700; color:var(--text-primary);">{current_display_name}</div>
+                <div style="font-size:0.68rem; color:var(--text-muted);">{sess_count} Sessions · 🏆 {ach_count} Badges</div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     st.markdown("---")
     st.markdown("<p style='color:var(--text-muted); font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;'>Universe & Calendar</p>", unsafe_allow_html=True)
@@ -274,6 +311,19 @@ engine = BacktestEngine(
 
 backtest_result = engine.run(target_df, strategy_instance, asset_name=target_asset)
 
+# Automatically record backtest session for user profile and achievements
+strat_m = backtest_result.metrics.get("Strategy", {})
+save_session(
+    username=st.session_state.get("username", "demo_analyst"),
+    display_name=st.session_state.get("name", "Demo Analyst"),
+    asset=target_asset,
+    strategy=strategy_choice,
+    sharpe=float(strat_m.get("Sharpe Ratio", 0.0)),
+    total_return_pct=float(strat_m.get("Total Return (%)", 0.0)),
+    max_drawdown_pct=float(strat_m.get("Max Drawdown (%)", 0.0)),
+    assets_in_universe=list(aligned_close.columns),
+)
+
 # Precompute correlation & regimes
 daily_returns_df = calculate_daily_returns(aligned_close).dropna()
 corr_matrix = calculate_correlation_matrix(daily_returns_df)
@@ -346,6 +396,15 @@ elif active_page == "regimes":
         periods_per_year=252 if target_asset != "Bitcoin" else 365,
         risk_free_rate=risk_free_rate,
     )
+
+elif active_page == "profile":
+    render_profile_view(
+        username=st.session_state.get("username", "demo_analyst"),
+        display_name=st.session_state.get("name", "Demo Analyst"),
+    )
+
+elif active_page == "admin":
+    render_admin_view()
 
 st.markdown('</div>', unsafe_allow_html=True)
 

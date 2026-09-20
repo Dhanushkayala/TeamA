@@ -221,10 +221,14 @@ NAV_PAGES: list[tuple[str, str]] = [
     ("backtest",  "Backtest"),
     ("robust",    "Robustness"),
     ("regimes",   "Regimes"),
+    ("profile",   "Profile"),
 ]
 
 def get_nav_pages() -> list[tuple[str, str]]:
-    return NAV_PAGES.copy()
+    pages = NAV_PAGES.copy()
+    if st.session_state.get("role") == "admin" or st.session_state.get("show_admin_llm_settings") or st.session_state.get("show_admin_tab"):
+        pages.append(("admin", "Admin"))
+    return pages
 
 _NAV_STATE_KEY = "ql_active_page"
 
@@ -257,7 +261,7 @@ def render_navbar() -> None:
     """, unsafe_allow_html=True)
 
     col_brand, col_nav, col_toggle = st.columns(
-        [2.5, 6.0, 1.5],
+        [2.0, 6.8, 1.2],
         vertical_alignment="center",
         gap="small"
     )

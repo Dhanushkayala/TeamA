@@ -26,3 +26,34 @@ def test_chat_with_quant_agent_queries():
         res = chat_with_quant_agent(msgs, sample_ctx, provider='heuristic')
         assert len(res) > 50
         assert "Gold" in res or "Python" in res or "VaR" in res or "Sharpe" in res
+
+
+def test_user_store_and_achievements():
+    from quant_platform.auth.user_store import load_profile, save_session, get_recent_sessions
+    test_user = "pytest_test_user"
+    prof = load_profile(test_user, "Pytest User")
+    assert prof["username"] == test_user
+
+    # Save a high-sharpe session
+    updated = save_session(
+        username=test_user,
+        display_name="Pytest User",
+        asset="Bitcoin",
+        strategy="Momentum",
+        sharpe=2.4,
+        total_return_pct=120.0,
+        max_drawdown_pct=-35.0,
+        assets_in_universe=["Gold", "Bitcoin", "NVIDIA"],
+    )
+
+    assert updated["total_sessions"] >= 1
+    assert "first_session" in updated["achievements"]
+    assert "sharpe_hunter" in updated["achievements"]
+    assert "multi_asset" in updated["achievements"]
+    assert "bear_survivor" in updated["achievements"]
+    assert "momentum_master" in updated["achievements"]
+
+    history = get_recent_sessions(test_user, n=5)
+    assert len(history) >= 1
+    assert history[0]["asset"] == "Bitcoin"
+
