@@ -349,7 +349,7 @@ for a_name in aligned_close.columns:
 # ─────────────────────────────────────────────────────────────────────────────
 # 7. TOP NAVIGATION BAR + PAGE ROUTING
 # ─────────────────────────────────────────────────────────────────────────────
-render_navbar()
+ai_nav_clicked = render_navbar()
 
 active_page = get_active_page()
 
@@ -435,7 +435,7 @@ def show_ai_dialog(
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 9. FLOATING AI CHATBOT FAB (Bottom-Right Corner)
+# 9. FLOATING AI CHATBOT FAB (Bottom-Right Corner) & NAVBAR AI TRIGGER
 # ─────────────────────────────────────────────────────────────────────────────
 st.markdown(f"""
 <div class="floating-ai-badge">
@@ -449,7 +449,7 @@ floating_clicked = st.button(
     help="Chat with BetaScope AI Quantitative Analyst",
 )
 
-if floating_clicked:
+if floating_clicked or ai_nav_clicked:
     show_ai_dialog(
         asset_name=target_asset,
         strategy_name=strategy_choice,

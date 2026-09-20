@@ -500,6 +500,32 @@ def apply_custom_css(theme: str = None) -> None:
         border-radius: var(--radius-sm) var(--radius-sm) 0 0 !important;
     }}
 
+    /* Navbar AI Copilot Action Button */
+    div.st-key-navbar_ai_copilot_btn button,
+    div[class*="st-key-navbar_ai_copilot_btn"] button {{
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.18) 0%, rgba(6, 182, 212, 0.22) 100%) !important;
+        border: 1px solid rgba(56, 189, 248, 0.45) !important;
+        border-radius: 12px !important;
+        color: var(--text-primary) !important;
+        font-weight: 700 !important;
+        font-size: 0.82rem !important;
+        padding: 4px 10px !important;
+        height: 38px !important;
+        transition: all 0.2s ease !important;
+        box-shadow: 0 2px 10px rgba(6, 182, 212, 0.15) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }}
+    div.st-key-navbar_ai_copilot_btn button:hover,
+    div[class*="st-key-navbar_ai_copilot_btn"] button:hover {{
+        background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%) !important;
+        color: #ffffff !important;
+        border-color: rgba(255, 255, 255, 0.5) !important;
+        box-shadow: 0 4px 18px rgba(6, 182, 212, 0.45) !important;
+        transform: translateY(-1px) !important;
+    }}
+
     /* ═══════════════════════════════════════════════════════════════
        PREMIUM KPI CARDS & SECTION HERO
     ═══════════════════════════════════════════════════════════════ */

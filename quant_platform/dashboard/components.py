@@ -238,11 +238,11 @@ def get_active_page() -> str:
     return st.session_state.get(_NAV_STATE_KEY, "overview")
 
 
-def render_navbar() -> None:
+def render_navbar() -> bool:
     """
     Render the unified sticky top navigation bar.
     Integrates Brand/Logo, Live sync badge, segmented page navigation,
-    and Light/Dark Mode toggle switch.
+    AI Copilot action button, and Light/Dark Mode toggle switch.
     """
     active = get_active_page()
     theme = get_current_theme()
@@ -254,14 +254,8 @@ def render_navbar() -> None:
     # Synchronize toggle state before widget instantiation
     st.session_state["nav_theme_toggle_switch"] = (theme == "light")
 
-    st.markdown("""
-    <div style="background:var(--bg-glass); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
-                border:1px solid var(--border); border-radius:14px; padding:8px 14px; margin-bottom:14px;
-                box-shadow:var(--shadow-card);">
-    """, unsafe_allow_html=True)
-
-    col_brand, col_nav, col_toggle = st.columns(
-        [2.0, 6.8, 1.2],
+    col_brand, col_nav, col_ai, col_toggle = st.columns(
+        [1.8, 6.2, 1.2, 0.8],
         vertical_alignment="center",
         gap="small"
     )
@@ -300,6 +294,10 @@ def render_navbar() -> None:
             st.session_state[_NAV_STATE_KEY] = selected_key
             st.rerun()
 
+    ai_clicked = False
+    with col_ai:
+        ai_clicked = st.button("🤖 AI Copilot", key="navbar_ai_copilot_btn", use_container_width=True)
+
     with col_toggle:
         st.toggle(
             "Light" if theme == "light" else "Dark",
@@ -307,6 +305,7 @@ def render_navbar() -> None:
             on_change=on_nav_theme_toggle_change,
         )
 
-    st.markdown("</div>", unsafe_allow_html=True)
+    return ai_clicked
+
 
 
