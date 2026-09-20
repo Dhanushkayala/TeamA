@@ -217,7 +217,7 @@ def render_ai_view(
                 with st.chat_message("user"):
                     st.markdown(msg["content"])
             else:
-                with st.chat_message("assistant", avatar=""):
+                with st.chat_message("assistant", avatar="🤖"):
                     st.markdown(msg["content"])
 
 
