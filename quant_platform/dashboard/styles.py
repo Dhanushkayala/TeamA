@@ -788,53 +788,77 @@ def apply_custom_css(theme: str = None) -> None:
         cursor: pointer !important;
     }}
 
-    /* Floating AI Chatbot Button & Badge */
+    /* Floating AI Chatbot Button & Badge (Bottom Right Corner) */
     .floating-ai-badge {{
-        position: fixed;
-        bottom: 84px;
-        right: 28px;
-        background: var(--bg-surface);
-        border: 1px solid var(--border);
-        border-radius: 20px;
-        padding: 4px 12px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        color: var(--accent-primary);
-        box-shadow: var(--shadow-card);
-        z-index: 9998;
-        pointer-events: none;
-        display: flex;
-        align-items: center;
-        gap: 6px;
+        position: fixed !important;
+        bottom: 86px !important;
+        right: 28px !important;
+        background: var(--bg-surface) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 20px !important;
+        padding: 5px 12px !important;
+        font-size: 0.74rem !important;
+        font-weight: 600 !important;
+        color: var(--accent-primary) !important;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
+        z-index: 99998 !important;
+        pointer-events: none !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
     }}
-    div[data-testid="stButton"] button:has(div:contains("💬")),
-    div[data-testid="stButton"] button:has(p:contains("💬")),
-    div[data-testid="stButton"] button:has(div:contains("AI")),
-    button[key="floating_corner_ai_btn"] {{
+
+    div[data-testid="stElementContainer"]:has(.st-key-floating_corner_ai_btn),
+    div.st-key-floating_corner_ai_btn,
+    div[class*="st-key-floating_corner_ai_btn"] {{
         position: fixed !important;
         bottom: 24px !important;
         right: 28px !important;
-        width: 52px !important;
-        height: 52px !important;
+        width: 54px !important;
+        height: 54px !important;
+        z-index: 99999 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }}
+
+    div.st-key-floating_corner_ai_btn button,
+    div[class*="st-key-floating_corner_ai_btn"] button,
+    .st-key-floating_corner_ai_btn > button {{
+        position: fixed !important;
+        bottom: 24px !important;
+        right: 28px !important;
+        width: 54px !important;
+        height: 54px !important;
         border-radius: 50% !important;
         background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%) !important;
         color: #ffffff !important;
-        font-size: 1.4rem !important;
-        border: 1px solid rgba(255, 255, 255, 0.25) !important;
-        box-shadow: 0 6px 24px rgba(37, 99, 235, 0.45) !important;
-        z-index: 9999 !important;
+        font-size: 1.45rem !important;
+        border: 2px solid rgba(255, 255, 255, 0.35) !important;
+        box-shadow: 0 8px 28px rgba(37, 99, 235, 0.55) !important;
+        z-index: 99999 !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
         padding: 0 !important;
-        transition: transform var(--transition-fast), box-shadow var(--transition-fast) !important;
+        cursor: pointer !important;
+        transition: transform 0.2s ease, box-shadow 0.2s ease !important;
     }}
-    div[data-testid="stButton"] button:has(div:contains("💬")):hover,
-    div[data-testid="stButton"] button:has(p:contains("💬")):hover,
-    div[data-testid="stButton"] button:has(div:contains("AI")):hover,
-    button[key="floating_corner_ai_btn"]:hover {{
-        transform: scale(1.08) !important;
-        box-shadow: 0 8px 30px rgba(6, 182, 212, 0.55) !important;
+
+    div.st-key-floating_corner_ai_btn button:hover,
+    div[class*="st-key-floating_corner_ai_btn"] button:hover,
+    .st-key-floating_corner_ai_btn > button:hover {{
+        transform: scale(1.12) !important;
+        box-shadow: 0 10px 36px rgba(6, 182, 212, 0.75) !important;
+    }}
+
+    div.st-key-floating_corner_ai_btn button p,
+    div[class*="st-key-floating_corner_ai_btn"] button p {{
+        font-size: 1.45rem !important;
+        line-height: 1 !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }}
 
     /* Page Fade-In Transition */
